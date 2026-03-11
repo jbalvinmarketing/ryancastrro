@@ -79,6 +79,7 @@ const Index = () => {
           muted
           playsInline
           preload="auto"
+          poster={videoPoster}
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source src={VIDEO_URL} type="video/mp4" />
