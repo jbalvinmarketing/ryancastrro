@@ -38,12 +38,12 @@ const products = [
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <MerchNavbar />
 
-      {/* Hero / Products Section with video background */}
-      <section className="relative min-h-screen pt-14">
-        {/* Video background */}
+      {/* Video section - fixed to viewport height on desktop, auto on mobile */}
+      <section className="relative h-auto sm:h-screen overflow-hidden">
+        {/* Video background - fixed position effect */}
         <video
           autoPlay
           loop
@@ -57,11 +57,14 @@ const Index = () => {
         {/* Dark overlay */}
         <div className="absolute inset-0 bg-background/40" />
 
-        <div className="relative z-10 container mx-auto px-4 py-16">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-12">
-            {products.map((product) => (
-              <ProductCard key={product.name} {...product} />
-            ))}
+        {/* Products grid scrollable over fixed video on desktop */}
+        <div className="relative z-10 h-full overflow-y-auto pt-14">
+          <div className="container mx-auto px-4 py-8 sm:py-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-12">
+              {products.map((product) => (
+                <ProductCard key={product.name} {...product} />
+              ))}
+            </div>
           </div>
         </div>
       </section>
