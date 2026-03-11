@@ -4,6 +4,10 @@ import hoodieBlack from "@/assets/hoodie-black.png";
 import capBlack from "@/assets/cap-black.png";
 import hoodieTan from "@/assets/hoodie-tan.png";
 import tshirtBlack from "@/assets/tshirt-black.png";
+import hoodieWhite from "@/assets/hoodie-white.png";
+import capRed from "@/assets/cap-red.png";
+import joggersBlack from "@/assets/joggers-black.png";
+import bagBlack from "@/assets/bag-black.png";
 
 const VIDEO_URL = "https://assets.cdn.filesafe.space/1z0IB1KcEYrz6wPpxZDl/media/69a0d322fd70df4f2f45dd2c.mp4";
 
@@ -34,6 +38,31 @@ const products = [
     price: "$45.00",
     animationClass: "animate-float",
   },
+  {
+    image: hoodieWhite,
+    name: "Hoodie Blanco RC Script",
+    price: "$85.00",
+    animationClass: "animate-float-delayed",
+  },
+  {
+    image: capRed,
+    name: "Gorra Roja RC Edition",
+    price: "$50.00",
+    preOrder: true,
+    animationClass: "animate-float",
+  },
+  {
+    image: joggersBlack,
+    name: "Joggers Negro RC",
+    price: "$70.00",
+    animationClass: "animate-float-slow",
+  },
+  {
+    image: bagBlack,
+    name: "Crossbody Bag RC",
+    price: "$40.00",
+    animationClass: "animate-float-delayed",
+  },
 ];
 
 const Index = () => {
@@ -41,9 +70,8 @@ const Index = () => {
     <div className="bg-background">
       <MerchNavbar />
 
-      {/* Video section - fixed to viewport height on desktop, auto on mobile */}
+      {/* Video section - fixed to viewport height */}
       <section className="relative h-screen overflow-hidden">
-        {/* Video background - fixed position effect */}
         <video
           autoPlay
           loop
@@ -54,10 +82,8 @@ const Index = () => {
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
 
-        {/* Dark overlay */}
         <div className="absolute inset-0 bg-background/40" />
 
-        {/* Products grid scrollable over fixed video on desktop */}
         <div className="relative z-10 h-full overflow-y-auto pt-14">
           <div className="container mx-auto px-4 py-8 sm:py-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-12">
