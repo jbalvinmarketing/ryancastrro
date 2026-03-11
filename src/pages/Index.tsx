@@ -77,10 +77,12 @@ const Index = () => {
           loop
           muted
           playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
+        <link rel="preload" as="video" href={VIDEO_URL} />
 
         <div className="absolute inset-0 bg-background/40" />
 
