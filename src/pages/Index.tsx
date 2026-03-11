@@ -42,7 +42,7 @@ const Index = () => {
       <MerchNavbar />
 
       {/* Video section - fixed to viewport height on desktop, auto on mobile */}
-      <section className="relative h-auto sm:h-screen overflow-hidden">
+      <section className="relative h-screen overflow-hidden">
         {/* Video background - fixed position effect */}
         <video
           autoPlay
