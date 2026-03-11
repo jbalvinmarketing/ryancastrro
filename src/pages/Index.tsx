@@ -8,6 +8,7 @@ import hoodieWhite from "@/assets/hoodie-white.png";
 import capRed from "@/assets/cap-red.png";
 import joggersBlack from "@/assets/joggers-black.png";
 import bagBlack from "@/assets/bag-black.png";
+import videoPoster from "@/assets/video-poster.jpg";
 
 const VIDEO_URL = "https://assets.cdn.filesafe.space/1z0IB1KcEYrz6wPpxZDl/media/69a0d322fd70df4f2f45dd2c.mp4";
 
@@ -78,6 +79,7 @@ const Index = () => {
           muted
           playsInline
           preload="auto"
+          poster={videoPoster}
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source src={VIDEO_URL} type="video/mp4" />
