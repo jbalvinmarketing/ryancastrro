@@ -15,7 +15,9 @@ const AppContent = () => {
   useCartSync();
   return (
     <>
-      <CartDrawer />
+      <div className="fixed top-3 right-4 z-[60]">
+        <CartDrawer />
+      </div>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/product/:handle" element={<ProductDetail />} />

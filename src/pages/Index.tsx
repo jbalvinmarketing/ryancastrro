@@ -27,22 +27,25 @@ const Index = () => {
   }, []);
 
   return (
-    <section className="relative h-screen overflow-hidden bg-background">
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        poster={videoPoster}
-        className="absolute inset-0 w-full h-full object-cover"
-      >
-        <source src={VIDEO_URL} type="video/mp4" />
-      </video>
+    <div className="relative min-h-screen bg-background">
+      {/* Fixed video background */}
+      <div className="fixed inset-0 z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          poster={videoPoster}
+          className="w-full h-full object-cover"
+        >
+          <source src={VIDEO_URL} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-background/40" />
+      </div>
 
-      <div className="absolute inset-0 bg-background/40" />
-
-      <div className="relative z-10 h-full overflow-y-auto">
+      {/* Scrollable content */}
+      <div className="relative z-10">
         <div className="container mx-auto px-4 py-8 sm:py-12">
           {loading ? (
             <div className="flex items-center justify-center py-24">
