@@ -233,7 +233,55 @@
   const STOREFRONT_URL = 'https://{{ shop.permanent_domain }}/api/2025-07/graphql.json';
   const STOREFRONT_TOKEN = '{{ section.settings.storefront_token }}';
 
-  const PRODUCTS_QUERY = `
+  const COLLECTION_QUERY = `
+    query GetCollection($handle: String!, $first: Int!) {
+      collection(handle: $handle) {
+        title
+        products(first: $first) {
+          edges {
+            node {
+              id
+              title
+              handle
+              priceRange {
+                minVariantPrice {
+                  amount
+                  currencyCode
+                }
+              }
+              images(first: 1) {
+                edges {
+                  node {
+                    url
+                    altText
+                  }
+                }
+              }
+              variants(first: 10) {
+                edges {
+                  node {
+                    id
+                    title
+                    price {
+                      amount
+                      currencyCode
+                    }
+                    availableForSale
+                    selectedOptions {
+                      name
+                      value
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const ALL_PRODUCTS_QUERY = `
     query GetProducts($first: Int!) {
       products(first: $first) {
         edges {
