@@ -29,12 +29,11 @@
   body.lobobot-home-video-active,
   body.lobobot-home-video-active #MainContent,
   body.lobobot-home-video-active .content-for-layout,
-  body.lobobot-home-video-active .shopify-section,
-  body.lobobot-home-video-active .shopify-section .gradient,
-  body.lobobot-home-video-active .gradient,
-  body.lobobot-home-video-active [class*="color-"],
+  body.lobobot-home-video-active .shopify-section:not(#shopify-section-header):not([id*="header"]):not([id*="announcement"]),
+  body.lobobot-home-video-active .shopify-section:not(#shopify-section-header):not([id*="header"]) .gradient,
+  body.lobobot-home-video-active #MainContent .gradient,
+  body.lobobot-home-video-active #MainContent [class*="color-"],
   body.lobobot-home-video-active #shopify-section-{{ section.id }},
-  body.lobobot-home-video-active #shopify-section-{{ section.id }} .shopify-section,
   body.lobobot-home-video-active #shopify-section-{{ section.id }} .page-width,
   body.lobobot-home-video-active #shopify-section-{{ section.id }} .page-width--narrow {
     background: transparent !important;
@@ -45,10 +44,10 @@
 
   body.lobobot-home-video-active #MainContent::before,
   body.lobobot-home-video-active #MainContent::after,
-  body.lobobot-home-video-active .shopify-section::before,
-  body.lobobot-home-video-active .shopify-section::after,
-  body.lobobot-home-video-active .gradient::before,
-  body.lobobot-home-video-active .gradient::after {
+  body.lobobot-home-video-active .shopify-section:not(#shopify-section-header):not([id*="header"])::before,
+  body.lobobot-home-video-active .shopify-section:not(#shopify-section-header):not([id*="header"])::after,
+  body.lobobot-home-video-active #MainContent .gradient::before,
+  body.lobobot-home-video-active #MainContent .gradient::after {
     background: transparent !important;
     background-image: none !important;
   }
