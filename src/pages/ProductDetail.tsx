@@ -30,6 +30,54 @@ interface ProductData {
   options: Array<{ name: string; values: string[] }>;
 }
 
+// Mobile image slider using Embla Carousel
+const MobileImageSlider = ({ images, productTitle }: { images: ProductImage[]; productTitle: string }) => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "center" });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", onSelect);
+    onSelect();
+    return () => { emblaApi.off("select", onSelect); };
+  }, [emblaApi]);
+
+  return (
+    <div>
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          {images.map((img, i) => (
+            <div
+              key={i}
+              className="flex-[0_0_100%] min-w-0 aspect-[3/4] flex items-center justify-center bg-secondary/5 px-10 py-8"
+            >
+              <img
+                src={img.url}
+                alt={img.altText || productTitle}
+                className="max-w-full max-h-full object-contain animate-float drop-shadow-2xl"
+                loading={i === 0 ? "eager" : "lazy"}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      {images.length > 1 && (
+        <div className="flex justify-center gap-1.5 py-3">
+          {images.map((_, i) => (
+            <div
+              key={i}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === selectedIndex ? "bg-foreground w-4" : "bg-muted-foreground/30 w-1.5"
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ProductDetail = () => {
   const { handle } = useParams<{ handle: string }>();
   const navigate = useNavigate();
@@ -39,11 +87,9 @@ const ProductDetail = () => {
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<"description" | "details">("description");
   const [desktopImageIndex, setDesktopImageIndex] = useState(0);
-  const [mobileImageIndex, setMobileImageIndex] = useState(0);
   const [buyingNow, setBuyingNow] = useState(false);
   const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const mobileCarouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!handle) return;
