@@ -375,18 +375,6 @@ const ProductDetail = () => {
 
   return (
     <div className="bg-background min-h-screen">
-      <MerchNavbar />
-
-      {/* Breadcrumb */}
-      <div className="border-b border-border">
-        <div className="max-w-[1400px] mx-auto px-4 pt-16 pb-3">
-          <nav className="flex items-center gap-1.5 text-[11px] tracking-wider text-muted-foreground uppercase">
-            <Link to="/" className="hover:text-foreground transition-colors">HOME</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-foreground truncate">{product.title.toUpperCase()}</span>
-          </nav>
-        </div>
-      </div>
 
       {/* ===== MOBILE LAYOUT ===== */}
       <div className="lg:hidden">
