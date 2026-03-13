@@ -4,8 +4,6 @@ import { storefrontApiRequest, PRODUCT_BY_HANDLE_QUERY, ShopifyProduct } from "@
 import { useCartStore } from "@/stores/cartStore";
 import { Loader2, ChevronRight, ChevronLeft, Package, Shield, Truck, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
-import MerchNavbar from "@/components/MerchNavbar";
-import RecommendedProducts from "@/components/RecommendedProducts";
 import useEmblaCarousel from "embla-carousel-react";
 
 type Tab = "description" | "details";
