@@ -24,20 +24,33 @@
     z-index: 2;
   }
 
-  /* Fuerza transparencia del shell del tema cuando esta sección está activa */
+  /* Fuerza transparencia global del tema cuando esta sección está activa */
+  html.lobobot-home-video-active,
   body.lobobot-home-video-active,
   body.lobobot-home-video-active #MainContent,
   body.lobobot-home-video-active .content-for-layout,
+  body.lobobot-home-video-active .shopify-section,
+  body.lobobot-home-video-active .shopify-section .gradient,
+  body.lobobot-home-video-active .gradient,
+  body.lobobot-home-video-active [class*="color-"],
   body.lobobot-home-video-active #shopify-section-{{ section.id }},
   body.lobobot-home-video-active #shopify-section-{{ section.id }} .shopify-section,
-  body.lobobot-home-video-active #shopify-section-{{ section.id }} .gradient,
-  body.lobobot-home-video-active #shopify-section-{{ section.id }} .color-background-1,
-  body.lobobot-home-video-active #shopify-section-{{ section.id }} .color-background-2,
   body.lobobot-home-video-active #shopify-section-{{ section.id }} .page-width,
   body.lobobot-home-video-active #shopify-section-{{ section.id }} .page-width--narrow {
     background: transparent !important;
     background-color: transparent !important;
+    background-image: none !important;
     box-shadow: none !important;
+  }
+
+  body.lobobot-home-video-active #MainContent::before,
+  body.lobobot-home-video-active #MainContent::after,
+  body.lobobot-home-video-active .shopify-section::before,
+  body.lobobot-home-video-active .shopify-section::after,
+  body.lobobot-home-video-active .gradient::before,
+  body.lobobot-home-video-active .gradient::after {
+    background: transparent !important;
+    background-image: none !important;
   }
 
   body.lobobot-home-video-active #MainContent {
@@ -46,23 +59,30 @@
   }
 
   .lobobot-video {
-    position: fixed;
+    position: fixed !important;
     inset: 0;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
     height: 100svh;
+    max-width: none;
     object-fit: cover;
     object-position: center;
     z-index: 0;
     pointer-events: none;
+    transform: none !important;
   }
 
   .lobobot-overlay {
     position: fixed;
     inset: 0;
+    top: 0;
+    left: 0;
     background: hsla(0, 0%, 5%, 0.22);
     z-index: 1;
     pointer-events: none;
+    transform: none !important;
   }
 
   .lobobot-content {
