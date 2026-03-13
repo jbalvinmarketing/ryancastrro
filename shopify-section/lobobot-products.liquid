@@ -445,7 +445,7 @@
 
   window.__lobobotAddToCart = addToCart;
 
-  var collectionHandle = '{{ section.settings.collection_handle }}'.trim();
+  var collectionHandle = '{{ section.settings.collection.handle | default: "" }}'.trim();
 
   if (collectionHandle) {
     storefrontRequest(COLLECTION_QUERY, { handle: collectionHandle, first: 50 })
@@ -460,16 +460,8 @@
           '<div class="lobobot-empty"><p>Error al cargar la colección</p></div>';
       });
   } else {
-    storefrontRequest(ALL_PRODUCTS_QUERY, { first: 50 })
-      .then(function(data) {
-        var allProducts = data && data.data && data.data.products ? data.data.products.edges : [];
-        renderProducts(allProducts);
-      })
-      .catch(function(err) {
-        console.error('Failed to load products:', err);
-        document.getElementById('lobobot-products').innerHTML =
-          '<div class="lobobot-empty"><p>Error al cargar productos</p></div>';
-      });
+    document.getElementById('lobobot-products').innerHTML =
+      '<div class="lobobot-empty"><p>Selecciona una colección en el editor de temas</p></div>';
   }
 })();
 </script>
