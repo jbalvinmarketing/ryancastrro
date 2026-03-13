@@ -148,12 +148,27 @@
     max-width: 480px;
     margin: 0 auto;
     aspect-ratio: 1;
-    background: hsl(0 0% 8%);
+    background: transparent;
+    border: 1px dashed hsl(0 0% 35%);
     border-radius: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     color: hsl(0 0% 60%);
+  }
+
+  /* Evita placeholders grises del tema ("No image") sobre el video fijo */
+  body.lobobot-home-video-active .banner__media,
+  body.lobobot-home-video-active .media,
+  body.lobobot-home-video-active .placeholder-svg,
+  body.lobobot-home-video-active .placeholder {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  body.lobobot-home-video-active .banner__media .placeholder-svg,
+  body.lobobot-home-video-active .media .placeholder-svg {
+    opacity: 0 !important;
   }
 
   .lobobot-card__title {
@@ -282,6 +297,7 @@
 (function() {
   const STOREFRONT_URL = 'https://{{ shop.permanent_domain }}/api/2025-07/graphql.json';
   const STOREFRONT_TOKEN = '{{ section.settings.storefront_token }}';
+  const FALLBACK_VIDEO_URL = 'https://assets.cdn.filesafe.space/1z0IB1KcEYrz6wPpxZDl/media/69a0d322fd70df4f2f45dd2c.mp4';
 
   var SECTION_ID = '{{ section.id }}';
   var BODY_CLASS = 'lobobot-home-video-active';
@@ -315,6 +331,38 @@
     }
   }
 
+  function ensureVideoSource(video) {
+    if (!video) return;
+    var source = video.querySelector('source');
+    if (!source) return;
+
+    var currentSrc = (source.getAttribute('src') || '').trim();
+    if (!currentSrc) {
+      source.setAttribute('src', FALLBACK_VIDEO_URL);
+    }
+
+    video.load();
+
+    var playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(function() {});
+    }
+  }
+
+  function bindVideoState(video, overlay) {
+    if (!video || !overlay || video.dataset.lobobotBound === 'true') return;
+
+    video.addEventListener('loadeddata', function() {
+      overlay.style.opacity = '1';
+    });
+
+    video.addEventListener('error', function() {
+      overlay.style.opacity = '0';
+    });
+
+    video.dataset.lobobotBound = 'true';
+  }
+
   function mountFixedBackgroundAtBody() {
     var sectionRoot = document.getElementById('shopify-section-' + SECTION_ID);
     if (!sectionRoot) return;
@@ -345,6 +393,8 @@
     }
 
     applyFixedLayerStyles(video, overlay);
+    ensureVideoSource(video);
+    bindVideoState(video, overlay);
   }
 
   function forceTransparentThemeShell() {
@@ -387,17 +437,27 @@
 
   function keepBackgroundPinned() {
     mountFixedBackgroundAtBody();
+    forceTransparentThemeShell();
   }
 
   initFixedBackground();
   window.addEventListener('resize', keepBackgroundPinned);
   window.addEventListener('scroll', keepBackgroundPinned, { passive: true });
 
+  setInterval(function() {
+    forceTransparentThemeShell();
+  }, 1200);
+
   document.addEventListener('shopify:section:load', function(event) {
     if (event && event.detail && event.detail.sectionId === SECTION_ID) {
       initFixedBackground();
+    } else {
+      forceTransparentThemeShell();
     }
   });
+
+  document.addEventListener('shopify:section:reorder', keepBackgroundPinned);
+  document.addEventListener('shopify:section:select', keepBackgroundPinned);
 
   const COLLECTION_QUERY = `
     query GetCollection($handle: String!, $first: Int!) {
