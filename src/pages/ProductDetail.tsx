@@ -144,22 +144,6 @@ const ProductDetail = () => {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [product]);
 
-  // Mobile: track horizontal scroll for dots
-  const handleMobileScroll = useCallback(() => {
-    const el = mobileCarouselRef.current;
-    if (!el) return;
-    const scrollLeft = el.scrollLeft;
-    const width = el.clientWidth;
-    const index = Math.round(scrollLeft / width);
-    setMobileImageIndex(index);
-  }, []);
-
-  useEffect(() => {
-    const el = mobileCarouselRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", handleMobileScroll);
-    return () => el.removeEventListener("scroll", handleMobileScroll);
-  }, [handleMobileScroll, product]);
 
   const scrollToImage = (index: number) => {
     imageRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "start" });
