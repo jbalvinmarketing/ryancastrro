@@ -46,18 +46,7 @@
     background-image: none !important;
   }
 
-  /* Asegura visibilidad del header y el icono del carrito */
-  body.lobobot-home-video-active [id*="header"],
-  body.lobobot-home-video-active .header-wrapper,
-  body.lobobot-home-video-active .header,
-  body.lobobot-home-video-active .header__icons,
-  body.lobobot-home-video-active .header__icon,
-  body.lobobot-home-video-active .header__icon svg {
-    position: relative;
-    z-index: 40 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
+  /* IMPORTANTE: no forzar estilos del header/cart icon para no romper el estado del tema */
 
   body.lobobot-home-video-active #MainContent {
     position: relative;
