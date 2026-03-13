@@ -52,7 +52,7 @@
 
   @media (min-width: 640px) {
     .lobobot-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(var(--lobobot-cols, 2), minmax(0, 1fr));
     }
   }
 
@@ -203,7 +203,7 @@
   }
 </style>
 
-<section class="lobobot-section">
+<section class="lobobot-section" style="--lobobot-cols: {{ section.settings.desktop_columns }};">
   <video
     autoplay
     loop
@@ -396,9 +396,17 @@
 
   window.__lobobotAddToCart = addToCart;
 
-  storefrontRequest(PRODUCTS_QUERY, { first: 20 })
+  var selectedHandles = '{{ section.settings.product_handles }}'.split(',').map(function(h) { return h.trim().toLowerCase(); }).filter(Boolean);
+
+  storefrontRequest(PRODUCTS_QUERY, { first: 50 })
     .then(function(data) {
-      renderProducts(data?.data?.products?.edges || []);
+      var allProducts = data && data.data && data.data.products ? data.data.products.edges : [];
+      if (selectedHandles.length > 0) {
+        allProducts = allProducts.filter(function(edge) {
+          return selectedHandles.indexOf(edge.node.handle.toLowerCase()) !== -1;
+        });
+      }
+      renderProducts(allProducts);
     })
     .catch(function(err) {
       console.error('Failed to load products:', err);
@@ -428,6 +436,23 @@
       "type": "image_picker",
       "id": "video_poster",
       "label": "Video Poster Image"
+    },
+    {
+      "type": "select",
+      "id": "desktop_columns",
+      "label": "Columnas en desktop",
+      "default": "2",
+      "options": [
+        { "value": "2", "label": "2 columnas" },
+        { "value": "3", "label": "3 columnas" }
+      ]
+    },
+    {
+      "type": "textarea",
+      "id": "product_handles",
+      "label": "Productos a mostrar (handles)",
+      "info": "Escribe los handles separados por coma. Déjalo vacío para mostrar todos. Ejemplo: basic-mystery-box, camiseta-negra",
+      "default": ""
     }
   ],
   "presets": [
