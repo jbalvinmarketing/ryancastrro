@@ -329,19 +329,23 @@
 
       showToast(title + ' agregado al carrito');
 
-      /* Update the theme's cart count badge if available */
+      /* Let the active Shopify theme own cart UI updates (badge + drawer) */
       try {
-        const cartRes = await fetch('/cart.js');
+        const cartRes = await fetch('/cart.js', { headers: { 'Accept': 'application/json' } });
         const cart = await cartRes.json();
-        /* Try common theme selectors for cart count */
-        document.querySelectorAll('[data-cart-count], .cart-count, .cart-count-bubble, .js-cart-count').forEach(function(el) {
-          el.textContent = cart.item_count;
-          el.style.display = cart.item_count > 0 ? '' : 'none';
-        });
-        /* Trigger theme cart drawer open if available */
-        document.dispatchEvent(new CustomEvent('cart:refresh'));
-        document.dispatchEvent(new CustomEvent('cart:added'));
-      } catch(e) { /* ignore badge update errors */ }
+
+        const detail = { cart: cart, source: 'lobobot' };
+        document.dispatchEvent(new CustomEvent('cart:refresh', { detail: detail }));
+        document.dispatchEvent(new CustomEvent('cart:added', { detail: detail }));
+        document.dispatchEvent(new CustomEvent('cart:updated', { detail: detail }));
+        document.dispatchEvent(new CustomEvent('cart:open', { detail: detail }));
+        window.dispatchEvent(new CustomEvent('cart:refresh', { detail: detail }));
+        window.dispatchEvent(new CustomEvent('cart:updated', { detail: detail }));
+
+        if (window.Shopify && typeof window.Shopify.onCartUpdate === 'function') {
+          window.Shopify.onCartUpdate(cart);
+        }
+      } catch(e) { /* ignore theme event bridge errors */ }
 
     } catch (err) {
       console.error('Add to cart failed:', err);

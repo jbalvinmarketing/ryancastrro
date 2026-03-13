@@ -547,16 +547,22 @@
 
       showToast(title + ' agregado al carrito');
 
-      /* Update the theme cart count */
+      /* Let the active Shopify theme own cart UI updates (badge + drawer) */
       try {
-        var cartRes = await fetch('/cart.js');
+        var cartRes = await fetch('/cart.js', { headers: { 'Accept': 'application/json' } });
         var cart = await cartRes.json();
-        document.querySelectorAll('[data-cart-count], .cart-count, .cart-count-bubble, .js-cart-count').forEach(function(el) {
-          el.textContent = cart.item_count;
-          el.style.display = cart.item_count > 0 ? '' : 'none';
-        });
-        document.dispatchEvent(new CustomEvent('cart:refresh'));
-        document.dispatchEvent(new CustomEvent('cart:added'));
+        var detail = { cart: cart, source: 'lobobot' };
+
+        document.dispatchEvent(new CustomEvent('cart:refresh', { detail: detail }));
+        document.dispatchEvent(new CustomEvent('cart:added', { detail: detail }));
+        document.dispatchEvent(new CustomEvent('cart:updated', { detail: detail }));
+        document.dispatchEvent(new CustomEvent('cart:open', { detail: detail }));
+        window.dispatchEvent(new CustomEvent('cart:refresh', { detail: detail }));
+        window.dispatchEvent(new CustomEvent('cart:updated', { detail: detail }));
+
+        if (window.Shopify && typeof window.Shopify.onCartUpdate === 'function') {
+          window.Shopify.onCartUpdate(cart);
+        }
       } catch(e) { /* ignore */ }
 
     } catch (err) {
