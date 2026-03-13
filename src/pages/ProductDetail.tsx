@@ -254,7 +254,6 @@ const ProductDetail = () => {
   if (!product) {
     return (
       <div className="bg-background min-h-screen">
-        <MerchNavbar />
         <div className="flex flex-col items-center justify-center h-screen gap-4">
           <p className="text-muted-foreground">Producto no encontrado</p>
           <Link to="/" className="text-accent hover:underline">Volver a la tienda</Link>
