@@ -1,0 +1,432 @@
+{% comment %}
+  LOBOBOT Products Section
+  Carga productos via Storefront API con video de fondo.
+  
+  Para usar: 
+  1. Ve a tu admin de Shopify → Online Store → Themes → Edit code
+  2. En "Sections", crea un nuevo archivo: lobobot-products.liquid
+  3. Pega todo este código
+  4. Añade la sección a tu página desde el editor de temas
+{% endcomment %}
+
+{{ 'https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap' | stylesheet_tag }}
+
+<style>
+  .lobobot-section {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    background: hsl(0 0% 5%);
+    font-family: 'Inter', sans-serif;
+    color: hsl(0 0% 95%);
+  }
+
+  .lobobot-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .lobobot-overlay {
+    position: absolute;
+    inset: 0;
+    background: hsla(0, 0%, 5%, 0.4);
+  }
+
+  .lobobot-content {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .lobobot-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .lobobot-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .lobobot-card {
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .lobobot-card:hover .lobobot-card__title {
+    text-decoration: underline;
+  }
+
+  .lobobot-card__image-wrap {
+    margin-bottom: 1rem;
+    animation: lobobot-float 4s ease-in-out infinite;
+  }
+
+  .lobobot-card__image {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+    filter: drop-shadow(0 25px 25px rgba(0, 0, 0, 0.5));
+    transition: transform 0.5s;
+  }
+
+  .lobobot-card:hover .lobobot-card__image {
+    transform: scale(1.05);
+  }
+
+  .lobobot-card__no-image {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    aspect-ratio: 1;
+    background: hsl(0 0% 8%);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: hsl(0 0% 60%);
+  }
+
+  .lobobot-card__title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-underline-offset: 2px;
+  }
+
+  .lobobot-card__price {
+    font-size: 0.875rem;
+    color: hsl(0 0% 60%);
+    margin-top: 0.25rem;
+  }
+
+  .lobobot-card__btn {
+    margin-top: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    background: hsl(25 95% 53%);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .lobobot-card__btn:hover {
+    opacity: 0.9;
+  }
+
+  .lobobot-card__btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .lobobot-card__soldout {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: hsl(0 0% 95%);
+    color: hsl(0 0% 5%);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+  }
+
+  .lobobot-loading,
+  .lobobot-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 0;
+    text-align: center;
+  }
+
+  .lobobot-spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid hsl(0 0% 30%);
+    border-top-color: hsl(0 0% 60%);
+    border-radius: 50%;
+    animation: lobobot-spin 0.8s linear infinite;
+  }
+
+  .lobobot-toast {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: hsl(0 0% 12%);
+    color: hsl(0 0% 95%);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+
+  .lobobot-toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @keyframes lobobot-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  @keyframes lobobot-spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<section class="lobobot-section">
+  <video
+    autoplay
+    loop
+    muted
+    playsinline
+    preload="auto"
+    poster="{{ section.settings.video_poster | img_url: 'master' }}"
+    class="lobobot-video"
+  >
+    <source src="{{ section.settings.video_url }}" type="video/mp4">
+  </video>
+
+  <div class="lobobot-overlay"></div>
+
+  <div class="lobobot-content">
+    <div id="lobobot-products" class="lobobot-loading">
+      <div class="lobobot-spinner"></div>
+    </div>
+  </div>
+</section>
+
+<div id="lobobot-toast" class="lobobot-toast"></div>
+
+<script>
+(function() {
+  const STOREFRONT_URL = 'https://{{ shop.permanent_domain }}/api/2025-07/graphql.json';
+  const STOREFRONT_TOKEN = '{{ section.settings.storefront_token }}';
+
+  const PRODUCTS_QUERY = `
+    query GetProducts($first: Int!) {
+      products(first: $first) {
+        edges {
+          node {
+            id
+            title
+            handle
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            images(first: 1) {
+              edges {
+                node {
+                  url
+                  altText
+                }
+              }
+            }
+            variants(first: 10) {
+              edges {
+                node {
+                  id
+                  title
+                  price {
+                    amount
+                    currencyCode
+                  }
+                  availableForSale
+                  selectedOptions {
+                    name
+                    value
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const CART_CREATE = `
+    mutation cartCreate($input: CartInput!) {
+      cartCreate(input: $input) {
+        cart {
+          id
+          checkoutUrl
+          lines(first: 100) { edges { node { id merchandise { ... on ProductVariant { id } } } } }
+        }
+        userErrors { field message }
+      }
+    }
+  `;
+
+  const CART_LINES_ADD = `
+    mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+      cartLinesAdd(cartId: $cartId, lines: $lines) {
+        cart {
+          id
+          lines(first: 100) { edges { node { id merchandise { ... on ProductVariant { id } } } } }
+        }
+        userErrors { field message }
+      }
+    }
+  `;
+
+  let cartId = null;
+  let checkoutUrl = null;
+
+  async function storefrontRequest(query, variables) {
+    const res = await fetch(STOREFRONT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': STOREFRONT_TOKEN
+      },
+      body: JSON.stringify({ query, variables })
+    });
+    if (!res.ok) throw new Error('Storefront API error: ' + res.status);
+    const data = await res.json();
+    if (data.errors) throw new Error(data.errors.map(e => e.message).join(', '));
+    return data;
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById('lobobot-toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  async function addToCart(variantId, title) {
+    try {
+      if (!cartId) {
+        const data = await storefrontRequest(CART_CREATE, {
+          input: { lines: [{ quantity: 1, merchandiseId: variantId }] }
+        });
+        const cart = data?.data?.cartCreate?.cart;
+        if (cart) {
+          cartId = cart.id;
+          const url = new URL(cart.checkoutUrl);
+          url.searchParams.set('channel', 'online_store');
+          checkoutUrl = url.toString();
+        }
+      } else {
+        await storefrontRequest(CART_LINES_ADD, {
+          cartId: cartId,
+          lines: [{ quantity: 1, merchandiseId: variantId }]
+        });
+      }
+      showToast(title + ' agregado al carrito');
+    } catch (err) {
+      console.error('Add to cart failed:', err);
+      showToast('Error al agregar al carrito');
+    }
+  }
+
+  function renderProducts(products) {
+    const container = document.getElementById('lobobot-products');
+
+    if (products.length === 0) {
+      container.innerHTML = '<div class="lobobot-empty"><p>No hay productos disponibles</p></div>';
+      return;
+    }
+
+    container.className = 'lobobot-grid';
+    container.innerHTML = products.map(function(edge) {
+      const p = edge.node;
+      const img = p.images.edges[0]?.node;
+      const price = p.priceRange.minVariantPrice;
+      const variant = p.variants.edges[0]?.node;
+      const available = variant?.availableForSale ?? false;
+
+      return `
+        <a href="/products/${p.handle}" class="lobobot-card">
+          <div class="lobobot-card__image-wrap" style="position:relative;">
+            ${img
+              ? `<img src="${img.url}" alt="${img.altText || p.title}" class="lobobot-card__image" loading="lazy">`
+              : `<div class="lobobot-card__no-image">Sin imagen</div>`
+            }
+            ${!available ? `<span class="lobobot-card__soldout">Agotado</span>` : ''}
+          </div>
+          <h3 class="lobobot-card__title">${p.title}</h3>
+          <p class="lobobot-card__price">${price.currencyCode} ${parseFloat(price.amount).toFixed(2)}</p>
+        </a>
+        ${available
+          ? `<div style="text-align:center;">
+              <button class="lobobot-card__btn" onclick="event.preventDefault(); window.__lobobotAddToCart('${variant.id}', '${p.title.replace(/'/g, "\\'")}')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                Agregar al carrito
+              </button>
+            </div>`
+          : ''
+        }
+      `;
+    }).join('');
+  }
+
+  window.__lobobotAddToCart = addToCart;
+
+  storefrontRequest(PRODUCTS_QUERY, { first: 20 })
+    .then(function(data) {
+      renderProducts(data?.data?.products?.edges || []);
+    })
+    .catch(function(err) {
+      console.error('Failed to load products:', err);
+      document.getElementById('lobobot-products').innerHTML =
+        '<div class="lobobot-empty"><p>Error al cargar productos</p></div>';
+    });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Lobobot Products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "storefront_token",
+      "label": "Storefront Access Token",
+      "default": "09e36a43315b4c8cfa1c5548a6861727"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL (mp4)",
+      "default": "https://assets.cdn.filesafe.space/1z0IB1KcEYrz6wPpxZDl/media/69a0d322fd70df4f2f45dd2c.mp4"
+    },
+    {
+      "type": "image_picker",
+      "id": "video_poster",
+      "label": "Video Poster Image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lobobot Products",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
