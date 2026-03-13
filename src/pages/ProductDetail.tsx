@@ -4,8 +4,6 @@ import { storefrontApiRequest, PRODUCT_BY_HANDLE_QUERY, ShopifyProduct } from "@
 import { useCartStore } from "@/stores/cartStore";
 import { Loader2, ChevronRight, ChevronLeft, Package, Shield, Truck, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
-import MerchNavbar from "@/components/MerchNavbar";
-import RecommendedProducts from "@/components/RecommendedProducts";
 import useEmblaCarousel from "embla-carousel-react";
 
 type Tab = "description" | "details";
@@ -246,7 +244,6 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="bg-background min-h-screen">
-        <MerchNavbar />
         <div className="flex items-center justify-center h-screen">
           <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         </div>
@@ -257,7 +254,6 @@ const ProductDetail = () => {
   if (!product) {
     return (
       <div className="bg-background min-h-screen">
-        <MerchNavbar />
         <div className="flex flex-col items-center justify-center h-screen gap-4">
           <p className="text-muted-foreground">Producto no encontrado</p>
           <Link to="/" className="text-accent hover:underline">Volver a la tienda</Link>
@@ -379,18 +375,6 @@ const ProductDetail = () => {
 
   return (
     <div className="bg-background min-h-screen">
-      <MerchNavbar />
-
-      {/* Breadcrumb */}
-      <div className="border-b border-border">
-        <div className="max-w-[1400px] mx-auto px-4 pt-16 pb-3">
-          <nav className="flex items-center gap-1.5 text-[11px] tracking-wider text-muted-foreground uppercase">
-            <Link to="/" className="hover:text-foreground transition-colors">HOME</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-foreground truncate">{product.title.toUpperCase()}</span>
-          </nav>
-        </div>
-      </div>
 
       {/* ===== MOBILE LAYOUT ===== */}
       <div className="lg:hidden">
@@ -446,8 +430,6 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Recommended Products */}
-      {handle && <RecommendedProducts currentHandle={handle} />}
     </div>
   );
 };
