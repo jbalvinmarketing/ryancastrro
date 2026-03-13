@@ -254,12 +254,12 @@ const ProductDetail = () => {
             <div
               key={i}
               ref={(el) => { imageRefs.current[i] = el; }}
-              className="w-full bg-secondary/5"
+              className="w-full bg-secondary/5 flex items-center justify-center py-8"
             >
               <img
                 src={img.url}
                 alt={img.altText || product.title}
-                className="w-full object-contain"
+                className="w-full max-w-[600px] mx-auto object-contain animate-float-slow drop-shadow-2xl"
                 loading={i === 0 ? "eager" : "lazy"}
               />
             </div>
