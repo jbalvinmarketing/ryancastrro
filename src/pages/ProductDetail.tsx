@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Package, Shield, Truck, RotateCcw, Loader2 } from "lucide-react";
