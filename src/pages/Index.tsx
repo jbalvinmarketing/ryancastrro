@@ -1,70 +1,73 @@
-import { useState, useEffect } from "react";
-import ShopifyProductCard from "@/components/ShopifyProductCard";
-import { storefrontApiRequest, PRODUCTS_QUERY, ShopifyProduct } from "@/lib/shopify";
-import { Loader2 } from "lucide-react";
-import videoPoster from "@/assets/video-poster.jpg";
+import MerchNavbar from "@/components/MerchNavbar";
+import ProductCard from "@/components/ProductCard";
+import hoodieBlack from "@/assets/hoodie-black.png";
+import capBlack from "@/assets/cap-black.png";
+import hoodieTan from "@/assets/hoodie-tan.png";
+import tshirtBlack from "@/assets/tshirt-black.png";
 
 const VIDEO_URL = "https://assets.cdn.filesafe.space/1z0IB1KcEYrz6wPpxZDl/media/69a0d322fd70df4f2f45dd2c.mp4";
 
+const products = [
+  {
+    image: capBlack,
+    name: "RC Snapback Gorra Negra",
+    price: "$55.00",
+    soldOut: true,
+    preOrder: true,
+    animationClass: "animate-float",
+  },
+  {
+    image: hoodieBlack,
+    name: "Hoodie Negro RC Logo",
+    price: "$85.00",
+    animationClass: "animate-float-delayed",
+  },
+  {
+    image: hoodieTan,
+    name: "Hoodie Tan Oversized",
+    price: "$90.00",
+    animationClass: "animate-float-slow",
+  },
+  {
+    image: tshirtBlack,
+    name: "Camiseta Tour Graphic",
+    price: "$45.00",
+    animationClass: "animate-float",
+  },
+];
+
 const Index = () => {
-  const [products, setProducts] = useState<ShopifyProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const data = await storefrontApiRequest(PRODUCTS_QUERY, { first: 20 });
-        if (data?.data?.products?.edges) {
-          setProducts(data.data.products.edges);
-        }
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchProducts();
-  }, []);
-
   return (
-    <div className="relative min-h-screen bg-background">
-      {/* Fixed video background */}
-      <div className="fixed inset-0 z-0">
+    <div className="bg-background">
+      <MerchNavbar />
+
+      {/* Video section - fixed to viewport height on desktop, auto on mobile */}
+      <section className="relative h-screen overflow-hidden">
+        {/* Video background - fixed position effect */}
         <video
           autoPlay
           loop
           muted
           playsInline
-          preload="auto"
-          poster={videoPoster}
-          className="w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover"
         >
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-background/40" />
-      </div>
 
-      {/* Scrollable content */}
-      <div className="relative z-10">
-        <div className="container mx-auto px-4 py-8 sm:py-12">
-          {loading ? (
-            <div className="flex items-center justify-center py-24">
-              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <p className="text-xl font-display text-foreground mb-2">No hay productos</p>
-              <p className="text-muted-foreground">Agrega productos desde tu panel de Shopify o dile al chat qué producto quieres crear.</p>
-            </div>
-          ) : (
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-background/40" />
+
+        {/* Products grid scrollable over fixed video on desktop */}
+        <div className="relative z-10 h-full overflow-y-auto pt-14">
+          <div className="container mx-auto px-4 py-8 sm:py-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-12">
               {products.map((product) => (
-                <ShopifyProductCard key={product.node.id} product={product} />
+                <ProductCard key={product.name} {...product} />
               ))}
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
