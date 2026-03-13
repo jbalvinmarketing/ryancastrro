@@ -437,17 +437,27 @@
 
   function keepBackgroundPinned() {
     mountFixedBackgroundAtBody();
+    forceTransparentThemeShell();
   }
 
   initFixedBackground();
   window.addEventListener('resize', keepBackgroundPinned);
   window.addEventListener('scroll', keepBackgroundPinned, { passive: true });
 
+  setInterval(function() {
+    forceTransparentThemeShell();
+  }, 1200);
+
   document.addEventListener('shopify:section:load', function(event) {
     if (event && event.detail && event.detail.sectionId === SECTION_ID) {
       initFixedBackground();
+    } else {
+      forceTransparentThemeShell();
     }
   });
+
+  document.addEventListener('shopify:section:reorder', keepBackgroundPinned);
+  document.addEventListener('shopify:section:select', keepBackgroundPinned);
 
   const COLLECTION_QUERY = `
     query GetCollection($handle: String!, $first: Int!) {
