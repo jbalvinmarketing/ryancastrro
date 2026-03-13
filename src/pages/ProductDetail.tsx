@@ -186,12 +186,12 @@ const ProductDetail = () => {
           {images.map((img, i) => (
             <div
               key={i}
-              className="min-w-full snap-center aspect-[4/5] bg-secondary/10 flex-shrink-0"
+              className="min-w-full snap-center aspect-[4/5] bg-secondary/10 flex-shrink-0 flex items-center justify-center overflow-hidden"
             >
               <img
                 src={img.url}
                 alt={img.altText || product.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain animate-float p-4"
                 loading={i === 0 ? "eager" : "lazy"}
               />
             </div>
@@ -254,12 +254,12 @@ const ProductDetail = () => {
             <div
               key={i}
               ref={(el) => { imageRefs.current[i] = el; }}
-              className="w-full bg-secondary/5"
+              className="w-full bg-secondary/5 flex items-center justify-center py-8"
             >
               <img
                 src={img.url}
                 alt={img.altText || product.title}
-                className="w-full object-contain"
+                className="w-full max-w-[600px] mx-auto object-contain animate-float-slow drop-shadow-2xl"
                 loading={i === 0 ? "eager" : "lazy"}
               />
             </div>
