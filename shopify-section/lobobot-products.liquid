@@ -47,12 +47,19 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 3rem 1rem;
+    align-items: start;
   }
 
   @media (min-width: 640px) {
     .lobobot-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+  }
+
+  .lobobot-card-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .lobobot-card {
@@ -60,6 +67,7 @@
     text-decoration: none;
     color: inherit;
     display: block;
+    width: 100%;
   }
 
   .lobobot-card:hover .lobobot-card__title {
