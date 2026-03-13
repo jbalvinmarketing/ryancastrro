@@ -442,11 +442,10 @@
 
   initFixedBackground();
   window.addEventListener('resize', keepBackgroundPinned);
-  window.addEventListener('scroll', keepBackgroundPinned, { passive: true });
 
-  setInterval(function() {
-    forceTransparentThemeShell();
-  }, 1200);
+  /* Reaplica en diferido para cambios del tema sin tocar header en loop */
+  setTimeout(keepBackgroundPinned, 300);
+  setTimeout(keepBackgroundPinned, 1200);
 
   document.addEventListener('shopify:section:load', function(event) {
     if (event && event.detail && event.detail.sectionId === SECTION_ID) {
