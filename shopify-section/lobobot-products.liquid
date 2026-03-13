@@ -407,9 +407,6 @@
     if (document.body) {
       document.body.classList.add(BODY_CLASS);
     }
-    if (document.documentElement) {
-      document.documentElement.classList.add(BODY_CLASS);
-    }
 
     var selectors = [
       '#MainContent',
@@ -424,16 +421,6 @@
         el.style.backgroundImage = 'none';
         el.style.boxShadow = 'none';
       });
-    });
-
-    /* Transparencia en secciones excepto header */
-    document.querySelectorAll('.shopify-section').forEach(function(el) {
-      var id = el.id || '';
-      if (id.indexOf('header') !== -1 || id.indexOf('announcement') !== -1) return;
-      el.style.background = 'transparent';
-      el.style.backgroundColor = 'transparent';
-      el.style.backgroundImage = 'none';
-      el.style.boxShadow = 'none';
     });
 
     var sectionRoot = document.getElementById('shopify-section-' + SECTION_ID);
