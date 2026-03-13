@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Search, User, ShoppingCart, Menu, X, ChevronDown } from "lucide-react";
+import { Search, User, Menu, X, ChevronDown } from "lucide-react";
+import { CartDrawer } from "@/components/CartDrawer";
 
 const MerchNavbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -31,9 +32,7 @@ const MerchNavbar = () => {
           <button className="text-muted-foreground hover:text-foreground transition-colors">
             <User className="w-5 h-5" />
           </button>
-          <button className="text-muted-foreground hover:text-foreground transition-colors">
-            <ShoppingCart className="w-5 h-5" />
-          </button>
+          <CartDrawer />
           <button
             className="md:hidden text-muted-foreground hover:text-foreground"
             onClick={() => setMobileOpen(!mobileOpen)}
