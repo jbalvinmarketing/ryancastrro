@@ -23,6 +23,19 @@
     isolation: isolate;
   }
 
+  /* Force transparent wrappers in Shopify theme so fixed background is visible */
+  #shopify-section-{{ section.id }},
+  #shopify-section-{{ section.id }} .shopify-section,
+  #shopify-section-{{ section.id }} .gradient,
+  #shopify-section-{{ section.id }} .color-background-1,
+  #shopify-section-{{ section.id }} .color-background-2,
+  #shopify-section-{{ section.id }} .page-width,
+  #shopify-section-{{ section.id }} .page-width--narrow {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
   .lobobot-video {
     position: fixed;
     inset: 0;
@@ -38,7 +51,7 @@
   .lobobot-overlay {
     position: fixed;
     inset: 0;
-    background: hsla(0, 0%, 5%, 0.4);
+    background: hsla(0, 0%, 5%, 0.22);
     z-index: -1;
     pointer-events: none;
   }
@@ -239,6 +252,28 @@
 (function() {
   const STOREFRONT_URL = 'https://{{ shop.permanent_domain }}/api/2025-07/graphql.json';
   const STOREFRONT_TOKEN = '{{ section.settings.storefront_token }}';
+
+  function forceTransparentThemeShell() {
+    var mainContent = document.getElementById('MainContent');
+    if (mainContent) {
+      mainContent.style.background = 'transparent';
+      mainContent.style.backgroundColor = 'transparent';
+    }
+
+    var contentForLayout = document.querySelector('.content-for-layout');
+    if (contentForLayout) {
+      contentForLayout.style.background = 'transparent';
+      contentForLayout.style.backgroundColor = 'transparent';
+    }
+
+    var sectionRoot = document.getElementById('shopify-section-{{ section.id }}');
+    if (sectionRoot) {
+      sectionRoot.style.background = 'transparent';
+      sectionRoot.style.backgroundColor = 'transparent';
+    }
+  }
+
+  forceTransparentThemeShell();
 
   const COLLECTION_QUERY = `
     query GetCollection($handle: String!, $first: Int!) {
