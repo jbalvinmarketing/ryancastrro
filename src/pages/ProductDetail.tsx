@@ -430,8 +430,6 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Recommended Products */}
-      {handle && <RecommendedProducts currentHandle={handle} />}
     </div>
   );
 };
