@@ -281,50 +281,6 @@
     }
   `;
 
-  const ALL_PRODUCTS_QUERY = `
-    query GetProducts($first: Int!) {
-      products(first: $first) {
-        edges {
-          node {
-            id
-            title
-            handle
-            priceRange {
-              minVariantPrice {
-                amount
-                currencyCode
-              }
-            }
-            images(first: 1) {
-              edges {
-                node {
-                  url
-                  altText
-                }
-              }
-            }
-            variants(first: 10) {
-              edges {
-                node {
-                  id
-                  title
-                  price {
-                    amount
-                    currencyCode
-                  }
-                  availableForSale
-                  selectedOptions {
-                    name
-                    value
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  `;
 
   const CART_CREATE = `
     mutation cartCreate($input: CartInput!) {
@@ -445,7 +401,7 @@
 
   window.__lobobotAddToCart = addToCart;
 
-  var collectionHandle = '{{ section.settings.collection_handle }}'.trim();
+  var collectionHandle = '{{ section.settings.collection.handle | default: "" }}'.trim();
 
   if (collectionHandle) {
     storefrontRequest(COLLECTION_QUERY, { handle: collectionHandle, first: 50 })
@@ -460,16 +416,8 @@
           '<div class="lobobot-empty"><p>Error al cargar la colección</p></div>';
       });
   } else {
-    storefrontRequest(ALL_PRODUCTS_QUERY, { first: 50 })
-      .then(function(data) {
-        var allProducts = data && data.data && data.data.products ? data.data.products.edges : [];
-        renderProducts(allProducts);
-      })
-      .catch(function(err) {
-        console.error('Failed to load products:', err);
-        document.getElementById('lobobot-products').innerHTML =
-          '<div class="lobobot-empty"><p>Error al cargar productos</p></div>';
-      });
+    document.getElementById('lobobot-products').innerHTML =
+      '<div class="lobobot-empty"><p>Selecciona una colección en el editor de temas</p></div>';
   }
 })();
 </script>
@@ -506,10 +454,9 @@
       ]
     },
     {
-      "type": "text",
-      "id": "collection_handle",
-      "label": "Handle de la colección",
-      "info": "Escribe el handle de la colección que quieres mostrar. Déjalo vacío para mostrar todos los productos. Ejemplo: mystery-boxes"
+      "type": "collection",
+      "id": "collection",
+      "label": "Colección de productos"
     }
   ],
   "presets": [
