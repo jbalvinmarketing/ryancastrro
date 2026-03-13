@@ -178,40 +178,8 @@ const ProductDetail = () => {
 
       {/* Mobile Layout */}
       <div className="lg:hidden">
-        {/* Mobile Carousel */}
-        <div
-          ref={mobileCarouselRef}
-          className="w-full overflow-x-auto snap-x snap-mandatory flex scrollbar-hide"
-          style={{ WebkitOverflowScrolling: "touch" }}
-        >
-          {images.map((img, i) => (
-            <div
-              key={i}
-              className="min-w-full snap-center aspect-[4/5] bg-secondary/10 flex-shrink-0 flex items-center justify-center overflow-hidden"
-            >
-              <img
-                src={img.url}
-                alt={img.altText || product.title}
-                className="w-full h-full object-contain animate-float p-4"
-                loading={i === 0 ? "eager" : "lazy"}
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Dots indicator */}
-        {images.length > 1 && (
-          <div className="flex justify-center gap-1.5 py-3">
-            {images.map((_, i) => (
-              <div
-                key={i}
-                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                  i === mobileImageIndex ? "bg-foreground w-4" : "bg-muted-foreground/30"
-                }`}
-              />
-            ))}
-          </div>
-        )}
+        {/* Mobile Embla Carousel */}
+        <MobileImageSlider images={images} productTitle={product.title} />
 
         {/* Mobile product info */}
         <div className="px-4 pb-10 pt-2">
