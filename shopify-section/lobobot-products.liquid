@@ -148,12 +148,27 @@
     max-width: 480px;
     margin: 0 auto;
     aspect-ratio: 1;
-    background: hsl(0 0% 8%);
+    background: transparent;
+    border: 1px dashed hsl(0 0% 35%);
     border-radius: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     color: hsl(0 0% 60%);
+  }
+
+  /* Evita placeholders grises del tema ("No image") sobre el video fijo */
+  body.lobobot-home-video-active .banner__media,
+  body.lobobot-home-video-active .media,
+  body.lobobot-home-video-active .placeholder-svg,
+  body.lobobot-home-video-active .placeholder {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  body.lobobot-home-video-active .banner__media .placeholder-svg,
+  body.lobobot-home-video-active .media .placeholder-svg {
+    opacity: 0 !important;
   }
 
   .lobobot-card__title {
