@@ -24,18 +24,14 @@
     z-index: 2;
   }
 
-  /* Fuerza transparencia global del tema cuando esta sección está activa */
-  html.lobobot-home-video-active,
-  body.lobobot-home-video-active,
+  /* Transparencia solo para el área de contenido; nunca header/drawer */
   body.lobobot-home-video-active #MainContent,
   body.lobobot-home-video-active .content-for-layout,
-  body.lobobot-home-video-active .shopify-section:not(#shopify-section-header):not([id*="header"]):not([id*="announcement"]),
-  body.lobobot-home-video-active .shopify-section:not(#shopify-section-header):not([id*="header"]) .gradient,
-  body.lobobot-home-video-active #MainContent .gradient,
-  body.lobobot-home-video-active #MainContent [class*="color-"],
   body.lobobot-home-video-active #shopify-section-{{ section.id }},
   body.lobobot-home-video-active #shopify-section-{{ section.id }} .page-width,
-  body.lobobot-home-video-active #shopify-section-{{ section.id }} .page-width--narrow {
+  body.lobobot-home-video-active #shopify-section-{{ section.id }} .page-width--narrow,
+  body.lobobot-home-video-active #shopify-section-{{ section.id }} .gradient,
+  body.lobobot-home-video-active #shopify-section-{{ section.id }} [class*="color-"] {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
@@ -44,12 +40,23 @@
 
   body.lobobot-home-video-active #MainContent::before,
   body.lobobot-home-video-active #MainContent::after,
-  body.lobobot-home-video-active .shopify-section:not(#shopify-section-header):not([id*="header"])::before,
-  body.lobobot-home-video-active .shopify-section:not(#shopify-section-header):not([id*="header"])::after,
-  body.lobobot-home-video-active #MainContent .gradient::before,
-  body.lobobot-home-video-active #MainContent .gradient::after {
+  body.lobobot-home-video-active #shopify-section-{{ section.id }} .gradient::before,
+  body.lobobot-home-video-active #shopify-section-{{ section.id }} .gradient::after {
     background: transparent !important;
     background-image: none !important;
+  }
+
+  /* Asegura visibilidad del header y el icono del carrito */
+  body.lobobot-home-video-active [id*="header"],
+  body.lobobot-home-video-active .header-wrapper,
+  body.lobobot-home-video-active .header,
+  body.lobobot-home-video-active .header__icons,
+  body.lobobot-home-video-active .header__icon,
+  body.lobobot-home-video-active .header__icon svg {
+    position: relative;
+    z-index: 40 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
   body.lobobot-home-video-active #MainContent {
