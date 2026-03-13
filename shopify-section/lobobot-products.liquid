@@ -396,9 +396,17 @@
 
   window.__lobobotAddToCart = addToCart;
 
-  storefrontRequest(PRODUCTS_QUERY, { first: 20 })
+  var selectedHandles = '{{ section.settings.product_handles }}'.split(',').map(function(h) { return h.trim().toLowerCase(); }).filter(Boolean);
+
+  storefrontRequest(PRODUCTS_QUERY, { first: 50 })
     .then(function(data) {
-      renderProducts(data?.data?.products?.edges || []);
+      var allProducts = data && data.data && data.data.products ? data.data.products.edges : [];
+      if (selectedHandles.length > 0) {
+        allProducts = allProducts.filter(function(edge) {
+          return selectedHandles.indexOf(edge.node.handle.toLowerCase()) !== -1;
+        });
+      }
+      renderProducts(allProducts);
     })
     .catch(function(err) {
       console.error('Failed to load products:', err);
