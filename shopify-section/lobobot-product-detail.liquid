@@ -805,6 +805,7 @@
 
   var cartId = null;
   var checkoutUrl = null;
+  var cartItems = [];
 
   function storefrontRequest(query, variables) {
     return fetch(STOREFRONT_URL, {
@@ -832,8 +833,88 @@
     return '$' + n.toLocaleString('es-CO', {minimumFractionDigits:0, maximumFractionDigits:0}) + ' ' + currency;
   }
 
-  async function addToCart(variantId, title) {
+  function updateCartUI() {
+    var totalItems = cartItems.reduce(function(s, i){ return s + i.quantity; }, 0);
+    var btn = document.getElementById('lpd-cart-btn');
+    var badge = document.getElementById('lpd-cart-badge');
+    var body = document.getElementById('lpd-drawer-body');
+    var footer = document.getElementById('lpd-drawer-footer');
+    var totalEl = document.getElementById('lpd-drawer-total');
+
+    btn.style.display = 'flex';
+    if (totalItems > 0) {
+      badge.style.display = 'flex';
+      badge.textContent = totalItems;
+    } else {
+      badge.style.display = 'none';
+    }
+
+    if (cartItems.length === 0) {
+      body.innerHTML = '<div class="lpd-drawer__empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><p>Tu carrito está vacío</p></div>';
+      footer.style.display = 'none';
+      return;
+    }
+
+    footer.style.display = 'block';
+    var total = cartItems.reduce(function(s, i){ return s + (parseFloat(i.price) * i.quantity); }, 0);
+    totalEl.textContent = '$' + total.toLocaleString('es-CO', {minimumFractionDigits:0, maximumFractionDigits:0}) + ' ' + (cartItems[0].currencyCode || '');
+
+    body.innerHTML = cartItems.map(function(item, idx) {
+      return '<div class="lpd-drawer-item">' +
+        '<div class="lpd-drawer-item__img">' + (item.imageUrl ? '<img src="' + item.imageUrl + '" alt="' + item.title + '">' : '') + '</div>' +
+        '<div class="lpd-drawer-item__info">' +
+          '<div class="lpd-drawer-item__title">' + item.title + '</div>' +
+          '<div class="lpd-drawer-item__variant">' + (item.variantTitle || '') + '</div>' +
+          '<div class="lpd-drawer-item__price">$' + parseFloat(item.price).toLocaleString('es-CO', {minimumFractionDigits:0, maximumFractionDigits:0}) + ' ' + item.currencyCode + '</div>' +
+        '</div>' +
+        '<div class="lpd-drawer-item__actions">' +
+          '<button class="lpd-drawer-item__remove" onclick="window.__lpdRemoveItem(' + idx + ')">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>' +
+          '</button>' +
+          '<div class="lpd-drawer-item__qty">' +
+            '<button onclick="window.__lpdUpdateQty(' + idx + ', ' + (item.quantity - 1) + ')">−</button>' +
+            '<span>' + item.quantity + '</span>' +
+            '<button onclick="window.__lpdUpdateQty(' + idx + ', ' + (item.quantity + 1) + ')">+</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function openDrawer() {
+    document.getElementById('lpd-drawer').classList.add('open');
+    document.getElementById('lpd-drawer-overlay').classList.add('open');
+  }
+
+  function closeDrawer() {
+    document.getElementById('lpd-drawer').classList.remove('open');
+    document.getElementById('lpd-drawer-overlay').classList.remove('open');
+  }
+
+  window.__lpdToggleDrawer = function() {
+    var drawer = document.getElementById('lpd-drawer');
+    drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+  };
+
+  window.__lpdRemoveItem = function(idx) {
+    cartItems.splice(idx, 1);
+    if (cartItems.length === 0) { cartId = null; checkoutUrl = null; }
+    updateCartUI();
+  };
+
+  window.__lpdUpdateQty = function(idx, qty) {
+    if (qty <= 0) { window.__lpdRemoveItem(idx); return; }
+    cartItems[idx].quantity = qty;
+    updateCartUI();
+  };
+
+  window.__lpdCheckout = function() {
+    if (checkoutUrl) window.open(checkoutUrl, '_blank');
+  };
+
+  async function addToCart(variantId, title, imageUrl, price, currencyCode, variantTitle) {
     try {
+      var existing = cartItems.find(function(i){ return i.variantId === variantId; });
       if (!cartId) {
         var data = await storefrontRequest(CART_CREATE, { input: { lines: [{ quantity:1, merchandiseId: variantId }] } });
         var cart = data && data.data && data.data.cartCreate && data.data.cartCreate.cart;
@@ -842,10 +923,20 @@
           var url = new URL(cart.checkoutUrl);
           url.searchParams.set('channel', 'online_store');
           checkoutUrl = url.toString();
+          var lineId = cart.lines.edges[0] ? cart.lines.edges[0].node.id : null;
+          cartItems.push({ variantId: variantId, lineId: lineId, title: title, price: price, currencyCode: currencyCode, quantity: 1, imageUrl: imageUrl, variantTitle: variantTitle });
         }
-      } else {
+      } else if (existing) {
+        existing.quantity += 1;
         await storefrontRequest(CART_LINES_ADD, { cartId: cartId, lines: [{ quantity:1, merchandiseId: variantId }] });
+      } else {
+        var data2 = await storefrontRequest(CART_LINES_ADD, { cartId: cartId, lines: [{ quantity:1, merchandiseId: variantId }] });
+        var lines = data2 && data2.data && data2.data.cartLinesAdd && data2.data.cartLinesAdd.cart ? data2.data.cartLinesAdd.cart.lines.edges : [];
+        var newLine = lines.find(function(l){ return l.node.merchandise.id === variantId; });
+        cartItems.push({ variantId: variantId, lineId: newLine ? newLine.node.id : null, title: title, price: price, currencyCode: currencyCode, quantity: 1, imageUrl: imageUrl, variantTitle: variantTitle });
       }
+      updateCartUI();
+      openDrawer();
       showToast(title + ' agregado al carrito');
     } catch(err) {
       console.error('Add to cart failed:', err);
@@ -853,8 +944,8 @@
     }
   }
 
-  async function buyNow(variantId, title) {
-    await addToCart(variantId, title);
+  async function buyNow(variantId, title, imageUrl, price, currencyCode, variantTitle) {
+    await addToCart(variantId, title, imageUrl, price, currencyCode, variantTitle);
     if (checkoutUrl) window.open(checkoutUrl, '_blank');
   }
 
