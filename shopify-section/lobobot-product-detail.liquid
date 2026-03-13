@@ -834,14 +834,12 @@
 
   window.__lpdAddToCart = function() {
     var sv = state.product.variants.edges[state.selectedVariantIdx].node;
-    var img = state.product.images.edges[0] ? state.product.images.edges[0].node.url : '';
-    addToCart(sv.id, state.product.title, img, sv.price.amount, sv.price.currencyCode, sv.title);
+    addToCart(sv.id, state.product.title);
   };
 
   window.__lpdBuyNow = function() {
     var sv = state.product.variants.edges[state.selectedVariantIdx].node;
-    var img = state.product.images.edges[0] ? state.product.images.edges[0].node.url : '';
-    buyNow(sv.id, state.product.title, img, sv.price.amount, sv.price.currencyCode, sv.title);
+    buyNow(sv.id, state.product.title);
   };
 
   window.__lpdScrollToImage = function(idx) {
