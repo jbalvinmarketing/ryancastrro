@@ -281,36 +281,6 @@
     }
   `;
 
-
-  const CART_CREATE = `
-    mutation cartCreate($input: CartInput!) {
-      cartCreate(input: $input) {
-        cart {
-          id
-          checkoutUrl
-          lines(first: 100) { edges { node { id merchandise { ... on ProductVariant { id } } } } }
-        }
-        userErrors { field message }
-      }
-    }
-  `;
-
-  const CART_LINES_ADD = `
-    mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
-      cartLinesAdd(cartId: $cartId, lines: $lines) {
-        cart {
-          id
-          lines(first: 100) { edges { node { id merchandise { ... on ProductVariant { id } } } } }
-        }
-        userErrors { field message }
-      }
-    }
-  `;
-
-  let cartId = null;
-  let checkoutUrl = null;
-  let cartItems = []; // { variantId, lineId, title, price, currencyCode, quantity, imageUrl }
-
   async function storefrontRequest(query, variables) {
     const res = await fetch(STOREFRONT_URL, {
       method: 'POST',
@@ -333,132 +303,46 @@
     setTimeout(() => toast.classList.remove('show'), 2500);
   }
 
-  function updateCartUI() {
-    const totalItems = cartItems.reduce((s, i) => s + i.quantity, 0);
-    const btn = document.getElementById('lobobot-cart-btn');
-    const badge = document.getElementById('lobobot-cart-badge');
-    const body = document.getElementById('lobobot-drawer-body');
-    const footer = document.getElementById('lobobot-drawer-footer');
-    const totalEl = document.getElementById('lobobot-drawer-total');
-
-    btn.style.display = 'flex';
-    if (totalItems > 0) {
-      badge.style.display = 'flex';
-      badge.textContent = totalItems;
-    } else {
-      badge.style.display = 'none';
-    }
-
-    if (cartItems.length === 0) {
-      body.innerHTML = '<div class="lobobot-drawer__empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><p>Tu carrito está vacío</p></div>';
-      footer.style.display = 'none';
-      return;
-    }
-
-    footer.style.display = 'block';
-    const total = cartItems.reduce((s, i) => s + (parseFloat(i.price) * i.quantity), 0);
-    totalEl.textContent = '$' + total.toLocaleString('es-CO', {minimumFractionDigits:0, maximumFractionDigits:0}) + ' ' + (cartItems[0]?.currencyCode || '');
-
-    body.innerHTML = cartItems.map((item, idx) => `
-      <div class="lobobot-drawer-item">
-        <div class="lobobot-drawer-item__img">
-          ${item.imageUrl ? '<img src="' + item.imageUrl + '" alt="' + item.title + '">' : ''}
-        </div>
-        <div class="lobobot-drawer-item__info">
-          <div class="lobobot-drawer-item__title">${item.title}</div>
-          <div class="lobobot-drawer-item__variant">${item.variantTitle || ''}</div>
-          <div class="lobobot-drawer-item__price">$${parseFloat(item.price).toLocaleString('es-CO', {minimumFractionDigits:0, maximumFractionDigits:0})} ${item.currencyCode}</div>
-        </div>
-        <div class="lobobot-drawer-item__actions">
-          <button class="lobobot-drawer-item__remove" onclick="window.__lobobotRemoveItem(${idx})">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </button>
-          <div class="lobobot-drawer-item__qty">
-            <button onclick="window.__lobobotUpdateQty(${idx}, ${item.quantity - 1})">−</button>
-            <span>${item.quantity}</span>
-            <button onclick="window.__lobobotUpdateQty(${idx}, ${item.quantity + 1})">+</button>
-          </div>
-        </div>
-      </div>
-    `).join('');
+  /* Extract numeric variant ID from GID */
+  function getNumericId(gid) {
+    const match = gid.match(/(\d+)$/);
+    return match ? match[1] : gid;
   }
 
-  function openDrawer() {
-    document.getElementById('lobobot-drawer').classList.add('open');
-    document.getElementById('lobobot-drawer-overlay').classList.add('open');
-  }
-
-  function closeDrawer() {
-    document.getElementById('lobobot-drawer').classList.remove('open');
-    document.getElementById('lobobot-drawer-overlay').classList.remove('open');
-  }
-
-  window.__lobobotToggleDrawer = function() {
-    const drawer = document.getElementById('lobobot-drawer');
-    drawer.classList.contains('open') ? closeDrawer() : openDrawer();
-  };
-
-  window.__lobobotRemoveItem = function(idx) {
-    cartItems.splice(idx, 1);
-    if (cartItems.length === 0) { cartId = null; checkoutUrl = null; }
-    updateCartUI();
-  };
-
-  window.__lobobotUpdateQty = function(idx, qty) {
-    if (qty <= 0) { window.__lobobotRemoveItem(idx); return; }
-    cartItems[idx].quantity = qty;
-    updateCartUI();
-  };
-
-  window.__lobobotCheckout = function() {
-    if (checkoutUrl) window.open(checkoutUrl, '_blank');
-  };
-
-  async function addToCart(variantId, title, imageUrl, price, currencyCode, variantTitle) {
+  /* Add to cart using Shopify native Cart API */
+  async function addToCart(variantGid, title) {
+    const numericId = getNumericId(variantGid);
     try {
-      const existing = cartItems.find(i => i.variantId === variantId);
-      if (!cartId) {
-        const data = await storefrontRequest(CART_CREATE, {
-          input: { lines: [{ quantity: 1, merchandiseId: variantId }] }
-        });
-        const cart = data?.data?.cartCreate?.cart;
-        if (cart) {
-          cartId = cart.id;
-          const url = new URL(cart.checkoutUrl);
-          url.searchParams.set('channel', 'online_store');
-          checkoutUrl = url.toString();
-          const lineId = cart.lines.edges[0]?.node?.id || null;
-          cartItems.push({ variantId, lineId, title, price, currencyCode, quantity: 1, imageUrl, variantTitle });
-        }
-      } else if (existing) {
-        existing.quantity += 1;
-        await storefrontRequest(CART_LINES_ADD, {
-          cartId: cartId,
-          lines: [{ quantity: 1, merchandiseId: variantId }]
-        });
-      } else {
-        const data = await storefrontRequest(CART_LINES_ADD, {
-          cartId: cartId,
-          lines: [{ quantity: 1, merchandiseId: variantId }]
-        });
-        const lines = data?.data?.cartLinesAdd?.cart?.lines?.edges || [];
-        const newLine = lines.find(l => l.node.merchandise.id === variantId);
-        cartItems.push({ variantId, lineId: newLine?.node?.id || null, title, price, currencyCode, quantity: 1, imageUrl, variantTitle });
-      }
-      updateCartUI();
-      openDrawer();
+      const res = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: [{ id: parseInt(numericId), quantity: 1 }] })
+      });
+      if (!res.ok) throw new Error('Error ' + res.status);
+
       showToast(title + ' agregado al carrito');
+
+      /* Update the theme's cart count badge if available */
+      try {
+        const cartRes = await fetch('/cart.js');
+        const cart = await cartRes.json();
+        /* Try common theme selectors for cart count */
+        document.querySelectorAll('[data-cart-count], .cart-count, .cart-count-bubble, .js-cart-count').forEach(function(el) {
+          el.textContent = cart.item_count;
+          el.style.display = cart.item_count > 0 ? '' : 'none';
+        });
+        /* Trigger theme cart drawer open if available */
+        document.dispatchEvent(new CustomEvent('cart:refresh'));
+        document.dispatchEvent(new CustomEvent('cart:added'));
+      } catch(e) { /* ignore badge update errors */ }
+
     } catch (err) {
       console.error('Add to cart failed:', err);
       showToast('Error al agregar al carrito');
     }
   }
 
-  // Store all products for reference when adding to cart
-  let allProducts = [];
-
   function renderProducts(products) {
-    allProducts = products;
     const container = document.getElementById('lobobot-products');
 
     if (products.length === 0) {
@@ -467,7 +351,7 @@
     }
 
     container.className = 'lobobot-grid';
-    container.innerHTML = products.map(function(edge, idx) {
+    container.innerHTML = products.map(function(edge) {
       const p = edge.node;
       const img = p.images.edges[0]?.node;
       const price = p.priceRange.minVariantPrice;
@@ -488,7 +372,7 @@
             <p class="lobobot-card__price">${price.currencyCode} ${parseFloat(price.amount).toFixed(2)}</p>
           </a>
           ${available
-            ? `<button class="lobobot-card__btn" onclick="event.preventDefault(); window.__lobobotAddToCart('${variant.id}', '${p.title.replace(/'/g, "\\'")}', '${img ? img.url : ''}', '${variant.price.amount}', '${variant.price.currencyCode}', '${variant.title.replace(/'/g, "\\'")}')">
+            ? `<button class="lobobot-card__btn" onclick="event.preventDefault(); window.__lobobotAddToCart('${variant.id}', '${p.title.replace(/'/g, "\\'")}')">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                 Agregar al carrito
               </button>`
@@ -497,13 +381,10 @@
         </article>
       `;
     }).join('');
-
-    // Show cart button
-    document.getElementById('lobobot-cart-btn').style.display = 'flex';
   }
 
-  window.__lobobotAddToCart = function(variantId, title, imageUrl, price, currencyCode, variantTitle) {
-    addToCart(variantId, title, imageUrl, price, currencyCode, variantTitle);
+  window.__lobobotAddToCart = function(variantId, title) {
+    addToCart(variantId, title);
   };
 
   var collectionHandle = '{{ section.settings.collection.handle | default: "" }}'.trim();
