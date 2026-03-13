@@ -262,27 +262,71 @@
   const STOREFRONT_URL = 'https://{{ shop.permanent_domain }}/api/2025-07/graphql.json';
   const STOREFRONT_TOKEN = '{{ section.settings.storefront_token }}';
 
-  function forceTransparentThemeShell() {
-    var mainContent = document.getElementById('MainContent');
-    if (mainContent) {
-      mainContent.style.background = 'transparent';
-      mainContent.style.backgroundColor = 'transparent';
+  var SECTION_ID = '{{ section.id }}';
+  var BODY_CLASS = 'lobobot-home-video-active';
+  var VIDEO_ID = 'lobobot-video-bg-{{ section.id }}';
+  var OVERLAY_ID = 'lobobot-overlay-bg-{{ section.id }}';
+
+  function mountFixedBackgroundAtBody() {
+    var sectionRoot = document.getElementById('shopify-section-' + SECTION_ID);
+    if (!sectionRoot) return;
+
+    var video = sectionRoot.querySelector('.lobobot-video');
+    var overlay = sectionRoot.querySelector('.lobobot-overlay');
+    if (!video || !overlay) return;
+
+    video.id = VIDEO_ID;
+    overlay.id = OVERLAY_ID;
+
+    var currentVideo = document.getElementById(VIDEO_ID);
+    if (currentVideo && currentVideo !== video) currentVideo.remove();
+
+    var currentOverlay = document.getElementById(OVERLAY_ID);
+    if (currentOverlay && currentOverlay !== overlay) currentOverlay.remove();
+
+    if (document.body.firstChild !== video) {
+      document.body.insertBefore(video, document.body.firstChild);
     }
 
-    var contentForLayout = document.querySelector('.content-for-layout');
-    if (contentForLayout) {
-      contentForLayout.style.background = 'transparent';
-      contentForLayout.style.backgroundColor = 'transparent';
-    }
-
-    var sectionRoot = document.getElementById('shopify-section-{{ section.id }}');
-    if (sectionRoot) {
-      sectionRoot.style.background = 'transparent';
-      sectionRoot.style.backgroundColor = 'transparent';
+    if (video.nextSibling) {
+      document.body.insertBefore(overlay, video.nextSibling);
+    } else {
+      document.body.appendChild(overlay);
     }
   }
 
-  forceTransparentThemeShell();
+  function forceTransparentThemeShell() {
+    if (document.body) {
+      document.body.classList.add(BODY_CLASS);
+    }
+
+    var selectors = [
+      '#MainContent',
+      '.content-for-layout',
+      '#shopify-section-' + SECTION_ID
+    ];
+
+    selectors.forEach(function(selector) {
+      var el = document.querySelector(selector);
+      if (!el) return;
+      el.style.background = 'transparent';
+      el.style.backgroundColor = 'transparent';
+      el.style.boxShadow = 'none';
+    });
+  }
+
+  function initFixedBackground() {
+    mountFixedBackgroundAtBody();
+    forceTransparentThemeShell();
+  }
+
+  initFixedBackground();
+
+  document.addEventListener('shopify:section:load', function(event) {
+    if (event && event.detail && event.detail.sectionId === SECTION_ID) {
+      initFixedBackground();
+    }
+  });
 
   const COLLECTION_QUERY = `
     query GetCollection($handle: String!, $first: Int!) {
