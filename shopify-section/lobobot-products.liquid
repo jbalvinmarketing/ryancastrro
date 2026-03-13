@@ -233,7 +233,55 @@
   const STOREFRONT_URL = 'https://{{ shop.permanent_domain }}/api/2025-07/graphql.json';
   const STOREFRONT_TOKEN = '{{ section.settings.storefront_token }}';
 
-  const PRODUCTS_QUERY = `
+  const COLLECTION_QUERY = `
+    query GetCollection($handle: String!, $first: Int!) {
+      collection(handle: $handle) {
+        title
+        products(first: $first) {
+          edges {
+            node {
+              id
+              title
+              handle
+              priceRange {
+                minVariantPrice {
+                  amount
+                  currencyCode
+                }
+              }
+              images(first: 1) {
+                edges {
+                  node {
+                    url
+                    altText
+                  }
+                }
+              }
+              variants(first: 10) {
+                edges {
+                  node {
+                    id
+                    title
+                    price {
+                      amount
+                      currencyCode
+                    }
+                    availableForSale
+                    selectedOptions {
+                      name
+                      value
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const ALL_PRODUCTS_QUERY = `
     query GetProducts($first: Int!) {
       products(first: $first) {
         edges {
@@ -397,23 +445,32 @@
 
   window.__lobobotAddToCart = addToCart;
 
-  var selectedHandles = '{{ section.settings.product_handles }}'.split(',').map(function(h) { return h.trim().toLowerCase(); }).filter(Boolean);
+  var collectionHandle = '{{ section.settings.collection_handle }}'.trim();
 
-  storefrontRequest(PRODUCTS_QUERY, { first: 50 })
-    .then(function(data) {
-      var allProducts = data && data.data && data.data.products ? data.data.products.edges : [];
-      if (selectedHandles.length > 0) {
-        allProducts = allProducts.filter(function(edge) {
-          return selectedHandles.indexOf(edge.node.handle.toLowerCase()) !== -1;
-        });
-      }
-      renderProducts(allProducts);
-    })
-    .catch(function(err) {
-      console.error('Failed to load products:', err);
-      document.getElementById('lobobot-products').innerHTML =
-        '<div class="lobobot-empty"><p>Error al cargar productos</p></div>';
-    });
+  if (collectionHandle) {
+    storefrontRequest(COLLECTION_QUERY, { handle: collectionHandle, first: 50 })
+      .then(function(data) {
+        var collection = data && data.data && data.data.collection;
+        var products = collection ? collection.products.edges : [];
+        renderProducts(products);
+      })
+      .catch(function(err) {
+        console.error('Failed to load collection:', err);
+        document.getElementById('lobobot-products').innerHTML =
+          '<div class="lobobot-empty"><p>Error al cargar la colección</p></div>';
+      });
+  } else {
+    storefrontRequest(ALL_PRODUCTS_QUERY, { first: 50 })
+      .then(function(data) {
+        var allProducts = data && data.data && data.data.products ? data.data.products.edges : [];
+        renderProducts(allProducts);
+      })
+      .catch(function(err) {
+        console.error('Failed to load products:', err);
+        document.getElementById('lobobot-products').innerHTML =
+          '<div class="lobobot-empty"><p>Error al cargar productos</p></div>';
+      });
+  }
 })();
 </script>
 
@@ -449,10 +506,10 @@
       ]
     },
     {
-      "type": "textarea",
-      "id": "product_handles",
-      "label": "Productos a mostrar (handles)",
-      "info": "Escribe los handles separados por coma. Déjalo vacío para mostrar todos. Ejemplo: basic-mystery-box, camiseta-negra"
+      "type": "text",
+      "id": "collection_handle",
+      "label": "Handle de la colección",
+      "info": "Escribe el handle de la colección que quieres mostrar. Déjalo vacío para mostrar todos los productos. Ejemplo: mystery-boxes"
     }
   ],
   "presets": [
