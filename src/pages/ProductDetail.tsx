@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Package, Shield, Truck, RotateCcw, Loader2 } from "lucide-react";
 import { fetchProductByHandle, createShopifyCartForBuyNow } from "@/lib/shopify";
@@ -37,10 +37,12 @@ const ProductDetail = () => {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<"description" | "details">("description");
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [desktopImageIndex, setDesktopImageIndex] = useState(0);
+  const [mobileImageIndex, setMobileImageIndex] = useState(0);
   const [buyingNow, setBuyingNow] = useState(false);
   const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const mobileCarouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!handle) return;
@@ -64,18 +66,15 @@ const ProductDetail = () => {
       .catch(() => setLoading(false));
   }, [handle]);
 
-  // Update selected variant when options change
   useEffect(() => {
     if (!product) return;
     const match = product.variants.edges.find((v) =>
-      v.node.selectedOptions.every(
-        (o) => selectedOptions[o.name] === o.value
-      )
+      v.node.selectedOptions.every((o) => selectedOptions[o.name] === o.value)
     );
     if (match) setSelectedVariant(match.node);
   }, [selectedOptions, product]);
 
-  // Track scroll position for active thumbnail
+  // Desktop: track scroll for active thumbnail
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -92,11 +91,28 @@ const ProductDetail = () => {
           closest = i;
         }
       });
-      setActiveImageIndex(closest);
+      setDesktopImageIndex(closest);
     };
     container.addEventListener("scroll", handleScroll);
     return () => container.removeEventListener("scroll", handleScroll);
   }, [product]);
+
+  // Mobile: track horizontal scroll for dots
+  const handleMobileScroll = useCallback(() => {
+    const el = mobileCarouselRef.current;
+    if (!el) return;
+    const scrollLeft = el.scrollLeft;
+    const width = el.clientWidth;
+    const index = Math.round(scrollLeft / width);
+    setMobileImageIndex(index);
+  }, []);
+
+  useEffect(() => {
+    const el = mobileCarouselRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", handleMobileScroll);
+    return () => el.removeEventListener("scroll", handleMobileScroll);
+  }, [handleMobileScroll, product]);
 
   const scrollToImage = (index: number) => {
     imageRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -150,19 +166,23 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Back button */}
+      {/* Back button - mobile: top-left with bg, desktop: clean */}
       <button
         onClick={() => navigate("/")}
-        className="fixed top-4 left-4 z-50 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="fixed top-3 left-3 z-50 flex items-center gap-1.5 text-sm text-foreground lg:text-muted-foreground hover:text-foreground transition-colors bg-background/70 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none rounded-full px-3 py-2 lg:px-0 lg:py-0 lg:top-4 lg:left-4"
       >
         <ArrowLeft className="w-4 h-4" />
-        <span className="hidden sm:inline">Volver</span>
+        <span className="text-xs lg:text-sm">Volver</span>
       </button>
 
       {/* Mobile Layout */}
       <div className="lg:hidden">
         {/* Mobile Carousel */}
-        <div className="w-full overflow-x-auto snap-x snap-mandatory flex">
+        <div
+          ref={mobileCarouselRef}
+          className="w-full overflow-x-auto snap-x snap-mandatory flex scrollbar-hide"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
           {images.map((img, i) => (
             <div
               key={i}
@@ -172,23 +192,28 @@ const ProductDetail = () => {
                 src={img.url}
                 alt={img.altText || product.title}
                 className="w-full h-full object-cover"
+                loading={i === 0 ? "eager" : "lazy"}
               />
             </div>
           ))}
         </div>
+
         {/* Dots indicator */}
-        <div className="flex justify-center gap-1.5 py-3">
-          {images.map((_, i) => (
-            <div
-              key={i}
-              className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                i === activeImageIndex ? "bg-foreground" : "bg-muted-foreground/30"
-              }`}
-            />
-          ))}
-        </div>
+        {images.length > 1 && (
+          <div className="flex justify-center gap-1.5 py-3">
+            {images.map((_, i) => (
+              <div
+                key={i}
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                  i === mobileImageIndex ? "bg-foreground w-4" : "bg-muted-foreground/30"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
         {/* Mobile product info */}
-        <div className="px-4 pb-8">
+        <div className="px-4 pb-10 pt-2">
           <ProductInfo
             product={product}
             price={price}
@@ -213,25 +238,18 @@ const ProductDetail = () => {
               key={i}
               onClick={() => scrollToImage(i)}
               className={`w-12 h-12 flex-shrink-0 rounded overflow-hidden border-2 transition-colors ${
-                activeImageIndex === i
+                desktopImageIndex === i
                   ? "border-foreground"
                   : "border-transparent hover:border-muted-foreground/40"
               }`}
             >
-              <img
-                src={img.url}
-                alt={img.altText || ""}
-                className="w-full h-full object-cover"
-              />
+              <img src={img.url} alt={img.altText || ""} className="w-full h-full object-cover" />
             </button>
           ))}
         </div>
 
         {/* Center: Stacked images */}
-        <div
-          ref={scrollContainerRef}
-          className="h-screen overflow-y-auto scrollbar-hide"
-        >
+        <div ref={scrollContainerRef} className="h-screen overflow-y-auto scrollbar-hide">
           {images.map((img, i) => (
             <div
               key={i}
@@ -242,6 +260,7 @@ const ProductDetail = () => {
                 src={img.url}
                 alt={img.altText || product.title}
                 className="w-full object-contain"
+                loading={i === 0 ? "eager" : "lazy"}
               />
             </div>
           ))}
@@ -301,17 +320,17 @@ const ProductInfo = ({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Title & Price */}
       <div>
-        <p className="text-xs text-muted-foreground tracking-widest uppercase mb-1 font-body">
+        <p className="text-[10px] text-muted-foreground tracking-[0.2em] uppercase mb-1 font-body">
           Ryan Castro Merch
         </p>
-        <h1 className="font-display text-2xl lg:text-3xl font-bold tracking-tight">
+        <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
           {product.title}
         </h1>
         {price && (
-          <p className="text-lg mt-2 text-foreground">
+          <p className="text-base sm:text-lg mt-1.5 text-foreground">
             {formatPrice(price.amount, price.currencyCode)}
           </p>
         )}
@@ -322,7 +341,7 @@ const ProductInfo = ({
         .filter((opt) => opt.name !== "Title" || opt.values.length > 1)
         .map((option) => (
           <div key={option.name}>
-            <p className="text-xs tracking-widest uppercase text-muted-foreground mb-3 font-body">
+            <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-2.5 font-body">
               {option.name}: <span className="text-foreground">{selectedOptions[option.name]}</span>
             </p>
             <div className="flex flex-wrap gap-2">
@@ -332,7 +351,7 @@ const ProductInfo = ({
                   <button
                     key={value}
                     onClick={() => onOptionChange(option.name, value)}
-                    className={`px-4 py-2 text-sm border transition-colors ${
+                    className={`px-3 sm:px-4 py-2 text-xs sm:text-sm border transition-colors ${
                       isSelected
                         ? "border-foreground bg-foreground text-background"
                         : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
@@ -347,9 +366,9 @@ const ProductInfo = ({
         ))}
 
       {/* Add to Cart / Buy Now */}
-      <div className="space-y-3 pt-2">
+      <div className="space-y-2.5 pt-1">
         <button
-          className="w-full py-3.5 text-sm font-medium tracking-wider uppercase border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors disabled:opacity-50"
+          className="w-full py-3 sm:py-3.5 text-xs sm:text-sm font-medium tracking-wider uppercase border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors disabled:opacity-50 active:scale-[0.98]"
           disabled={!selectedVariant?.availableForSale}
         >
           {selectedVariant?.availableForSale ? "AÑADIR AL CARRITO" : "AGOTADO"}
@@ -357,7 +376,7 @@ const ProductInfo = ({
         <button
           onClick={onBuyNow}
           disabled={buyingNow || !selectedVariant?.availableForSale}
-          className="w-full py-3.5 text-sm font-medium tracking-wider uppercase bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-3 sm:py-3.5 text-xs sm:text-sm font-medium tracking-wider uppercase bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 active:scale-[0.98]"
         >
           {buyingNow ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -368,21 +387,21 @@ const ProductInfo = ({
       </div>
 
       {/* Benefits */}
-      <div className="grid grid-cols-2 gap-3 pt-2">
+      <div className="grid grid-cols-2 gap-2.5 pt-1">
         {benefits.map(({ icon: Icon, label }) => (
-          <div key={label} className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Icon className="w-4 h-4 flex-shrink-0" />
+          <div key={label} className="flex items-center gap-2 text-[11px] text-muted-foreground">
+            <Icon className="w-3.5 h-3.5 flex-shrink-0" />
             <span>{label}</span>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
-      <div className="border-t border-border pt-6">
+      <div className="border-t border-border pt-5">
         <div className="flex border-b border-border">
           <button
             onClick={() => setActiveTab("description")}
-            className={`pb-3 px-1 mr-6 text-xs tracking-widest uppercase transition-colors border-b-2 ${
+            className={`pb-2.5 px-1 mr-6 text-[10px] tracking-[0.2em] uppercase transition-colors border-b-2 ${
               activeTab === "description"
                 ? "border-foreground text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground"
@@ -392,7 +411,7 @@ const ProductInfo = ({
           </button>
           <button
             onClick={() => setActiveTab("details")}
-            className={`pb-3 px-1 text-xs tracking-widest uppercase transition-colors border-b-2 ${
+            className={`pb-2.5 px-1 text-[10px] tracking-[0.2em] uppercase transition-colors border-b-2 ${
               activeTab === "details"
                 ? "border-foreground text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground"
@@ -401,7 +420,7 @@ const ProductInfo = ({
             Detalles
           </button>
         </div>
-        <div className="pt-4 text-sm text-muted-foreground leading-relaxed font-body">
+        <div className="pt-4 text-xs sm:text-sm text-muted-foreground leading-relaxed font-body">
           {activeTab === "description" ? (
             product.description ? (
               <p>{product.description}</p>
@@ -413,7 +432,7 @@ const ProductInfo = ({
               <li>• Producto oficial Ryan Castro</li>
               <li>• Material premium</li>
               <li>• Edición limitada</li>
-              {selectedVariant && (
+              {selectedVariant && selectedVariant.title !== "Default Title" && (
                 <li>• Variante: {selectedVariant.title}</li>
               )}
             </ul>
