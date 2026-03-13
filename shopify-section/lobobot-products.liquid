@@ -445,23 +445,32 @@
 
   window.__lobobotAddToCart = addToCart;
 
-  var selectedHandles = '{{ section.settings.product_handles }}'.split(',').map(function(h) { return h.trim().toLowerCase(); }).filter(Boolean);
+  var collectionHandle = '{{ section.settings.collection_handle }}'.trim();
 
-  storefrontRequest(PRODUCTS_QUERY, { first: 50 })
-    .then(function(data) {
-      var allProducts = data && data.data && data.data.products ? data.data.products.edges : [];
-      if (selectedHandles.length > 0) {
-        allProducts = allProducts.filter(function(edge) {
-          return selectedHandles.indexOf(edge.node.handle.toLowerCase()) !== -1;
-        });
-      }
-      renderProducts(allProducts);
-    })
-    .catch(function(err) {
-      console.error('Failed to load products:', err);
-      document.getElementById('lobobot-products').innerHTML =
-        '<div class="lobobot-empty"><p>Error al cargar productos</p></div>';
-    });
+  if (collectionHandle) {
+    storefrontRequest(COLLECTION_QUERY, { handle: collectionHandle, first: 50 })
+      .then(function(data) {
+        var collection = data && data.data && data.data.collection;
+        var products = collection ? collection.products.edges : [];
+        renderProducts(products);
+      })
+      .catch(function(err) {
+        console.error('Failed to load collection:', err);
+        document.getElementById('lobobot-products').innerHTML =
+          '<div class="lobobot-empty"><p>Error al cargar la colección</p></div>';
+      });
+  } else {
+    storefrontRequest(ALL_PRODUCTS_QUERY, { first: 50 })
+      .then(function(data) {
+        var allProducts = data && data.data && data.data.products ? data.data.products.edges : [];
+        renderProducts(allProducts);
+      })
+      .catch(function(err) {
+        console.error('Failed to load products:', err);
+        document.getElementById('lobobot-products').innerHTML =
+          '<div class="lobobot-empty"><p>Error al cargar productos</p></div>';
+      });
+  }
 })();
 </script>
 
