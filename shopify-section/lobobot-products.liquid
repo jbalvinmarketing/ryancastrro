@@ -331,6 +331,38 @@
     }
   }
 
+  function ensureVideoSource(video) {
+    if (!video) return;
+    var source = video.querySelector('source');
+    if (!source) return;
+
+    var currentSrc = (source.getAttribute('src') || '').trim();
+    if (!currentSrc) {
+      source.setAttribute('src', FALLBACK_VIDEO_URL);
+    }
+
+    video.load();
+
+    var playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(function() {});
+    }
+  }
+
+  function bindVideoState(video, overlay) {
+    if (!video || !overlay || video.dataset.lobobotBound === 'true') return;
+
+    video.addEventListener('loadeddata', function() {
+      overlay.style.opacity = '1';
+    });
+
+    video.addEventListener('error', function() {
+      overlay.style.opacity = '0';
+    });
+
+    video.dataset.lobobotBound = 'true';
+  }
+
   function mountFixedBackgroundAtBody() {
     var sectionRoot = document.getElementById('shopify-section-' + SECTION_ID);
     if (!sectionRoot) return;
