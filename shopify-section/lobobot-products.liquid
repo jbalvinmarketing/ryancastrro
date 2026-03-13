@@ -23,6 +23,19 @@
     isolation: isolate;
   }
 
+  /* Force transparent wrappers in Shopify theme so fixed background is visible */
+  #shopify-section-{{ section.id }},
+  #shopify-section-{{ section.id }} .shopify-section,
+  #shopify-section-{{ section.id }} .gradient,
+  #shopify-section-{{ section.id }} .color-background-1,
+  #shopify-section-{{ section.id }} .color-background-2,
+  #shopify-section-{{ section.id }} .page-width,
+  #shopify-section-{{ section.id }} .page-width--narrow {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
   .lobobot-video {
     position: fixed;
     inset: 0;
