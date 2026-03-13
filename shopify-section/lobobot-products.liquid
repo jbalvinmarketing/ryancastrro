@@ -253,6 +253,7 @@
   }
 </style>
 
+{% assign lobobot_video_url = section.settings.video_url | strip | default: 'https://assets.cdn.filesafe.space/1z0IB1KcEYrz6wPpxZDl/media/69a0d322fd70df4f2f45dd2c.mp4' %}
 <section class="lobobot-section" style="--lobobot-cols: {{ section.settings.desktop_columns }};">
   <video
     autoplay
@@ -263,7 +264,7 @@
     poster="{{ section.settings.video_poster | img_url: 'master' }}"
     class="lobobot-video"
   >
-    <source src="{{ section.settings.video_url }}" type="video/mp4">
+    <source src="{{ lobobot_video_url }}" type="video/mp4">
   </video>
 
   <div class="lobobot-overlay"></div>
