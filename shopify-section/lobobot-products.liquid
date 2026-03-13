@@ -393,6 +393,8 @@
     }
 
     applyFixedLayerStyles(video, overlay);
+    ensureVideoSource(video);
+    bindVideoState(video, overlay);
   }
 
   function forceTransparentThemeShell() {
