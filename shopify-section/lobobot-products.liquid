@@ -288,6 +288,33 @@
   var VIDEO_ID = 'lobobot-video-bg-{{ section.id }}';
   var OVERLAY_ID = 'lobobot-overlay-bg-{{ section.id }}';
 
+  function applyFixedLayerStyles(video, overlay) {
+    if (video) {
+      video.style.position = 'fixed';
+      video.style.inset = '0';
+      video.style.top = '0';
+      video.style.left = '0';
+      video.style.width = '100vw';
+      video.style.height = '100vh';
+      video.style.objectFit = 'cover';
+      video.style.objectPosition = 'center';
+      video.style.pointerEvents = 'none';
+      video.style.zIndex = '0';
+      video.style.maxWidth = 'none';
+      video.style.transform = 'none';
+    }
+
+    if (overlay) {
+      overlay.style.position = 'fixed';
+      overlay.style.inset = '0';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.pointerEvents = 'none';
+      overlay.style.zIndex = '1';
+      overlay.style.transform = 'none';
+    }
+  }
+
   function mountFixedBackgroundAtBody() {
     var sectionRoot = document.getElementById('shopify-section-' + SECTION_ID);
     if (!sectionRoot) return;
@@ -305,35 +332,52 @@
     var currentOverlay = document.getElementById(OVERLAY_ID);
     if (currentOverlay && currentOverlay !== overlay) currentOverlay.remove();
 
-    if (document.body.firstChild !== video) {
+    if (video.parentNode !== document.body) {
       document.body.insertBefore(video, document.body.firstChild);
     }
 
-    if (video.nextSibling) {
-      document.body.insertBefore(overlay, video.nextSibling);
-    } else {
-      document.body.appendChild(overlay);
+    if (overlay.parentNode !== document.body || overlay.previousSibling !== video) {
+      if (video.nextSibling) {
+        document.body.insertBefore(overlay, video.nextSibling);
+      } else {
+        document.body.appendChild(overlay);
+      }
     }
+
+    applyFixedLayerStyles(video, overlay);
   }
 
   function forceTransparentThemeShell() {
     if (document.body) {
       document.body.classList.add(BODY_CLASS);
     }
+    if (document.documentElement) {
+      document.documentElement.classList.add(BODY_CLASS);
+    }
 
     var selectors = [
       '#MainContent',
       '.content-for-layout',
-      '#shopify-section-' + SECTION_ID
+      '#shopify-section-' + SECTION_ID,
+      '.shopify-section',
+      '.gradient',
+      '[class*="color-"]'
     ];
 
     selectors.forEach(function(selector) {
-      var el = document.querySelector(selector);
-      if (!el) return;
-      el.style.background = 'transparent';
-      el.style.backgroundColor = 'transparent';
-      el.style.boxShadow = 'none';
+      document.querySelectorAll(selector).forEach(function(el) {
+        el.style.background = 'transparent';
+        el.style.backgroundColor = 'transparent';
+        el.style.backgroundImage = 'none';
+        el.style.boxShadow = 'none';
+      });
     });
+
+    var sectionRoot = document.getElementById('shopify-section-' + SECTION_ID);
+    if (sectionRoot) {
+      sectionRoot.style.setProperty('--gradient-background', 'transparent');
+      sectionRoot.style.setProperty('--color-background', '0 0 0 / 0');
+    }
   }
 
   function initFixedBackground() {
@@ -341,7 +385,13 @@
     forceTransparentThemeShell();
   }
 
+  function keepBackgroundPinned() {
+    mountFixedBackgroundAtBody();
+  }
+
   initFixedBackground();
+  window.addEventListener('resize', keepBackgroundPinned);
+  window.addEventListener('scroll', keepBackgroundPinned, { passive: true });
 
   document.addEventListener('shopify:section:load', function(event) {
     if (event && event.detail && event.detail.sectionId === SECTION_ID) {
