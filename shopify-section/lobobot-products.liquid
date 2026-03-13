@@ -194,259 +194,11 @@
     transform: translateX(-50%) translateY(0);
   }
 
-  /* Cart floating button */
-  .lobobot-cart-btn {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 9998;
-    background: hsl(0 0% 12%);
-    border: 1px solid hsl(0 0% 20%);
-    color: hsl(0 0% 95%);
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.2s;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  }
-
-  .lobobot-cart-btn:hover { background: hsl(0 0% 18%); }
-
-  .lobobot-cart-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: hsl(25 95% 53%);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 600;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* Cart drawer */
-  .lobobot-drawer-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 10000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-  }
-
-  .lobobot-drawer-overlay.open { opacity: 1; visibility: visible; }
-
-  .lobobot-drawer {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    max-width: 420px;
-    background: hsl(0 0% 8%);
-    z-index: 10001;
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    color: hsl(0 0% 95%);
-    font-family: 'Inter', sans-serif;
-  }
-
-  .lobobot-drawer.open { transform: translateX(0); }
-
-  .lobobot-drawer__header {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid hsl(0 0% 15%);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .lobobot-drawer__title {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.125rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-  }
-
-  .lobobot-drawer__close {
-    background: none;
-    border: none;
-    color: hsl(0 0% 60%);
-    cursor: pointer;
-    padding: 4px;
-    transition: color 0.2s;
-  }
-
-  .lobobot-drawer__close:hover { color: hsl(0 0% 95%); }
-
-  .lobobot-drawer__body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem 1.5rem;
-  }
-
-  .lobobot-drawer__empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: hsl(0 0% 60%);
-    gap: 0.5rem;
-  }
-
-  .lobobot-drawer-item {
-    display: flex;
-    gap: 0.75rem;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid hsl(0 0% 15%);
-  }
-
-  .lobobot-drawer-item__img {
-    width: 64px;
-    height: 64px;
-    border-radius: 4px;
-    overflow: hidden;
-    background: hsl(0 0% 12%);
-    flex-shrink: 0;
-  }
-
-  .lobobot-drawer-item__img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .lobobot-drawer-item__info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .lobobot-drawer-item__title {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .lobobot-drawer-item__variant {
-    font-size: 0.6875rem;
-    color: hsl(0 0% 60%);
-  }
-
-  .lobobot-drawer-item__price {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    margin-top: 2px;
-  }
-
-  .lobobot-drawer-item__actions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.5rem;
-    flex-shrink: 0;
-  }
-
-  .lobobot-drawer-item__remove {
-    background: none;
-    border: none;
-    color: hsl(0 0% 60%);
-    cursor: pointer;
-    padding: 2px;
-    font-size: 0.75rem;
-    transition: color 0.2s;
-  }
-
-  .lobobot-drawer-item__remove:hover { color: hsl(0 80% 60%); }
-
-  .lobobot-drawer-item__qty {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .lobobot-drawer-item__qty button {
-    width: 24px;
-    height: 24px;
-    border: 1px solid hsl(0 0% 20%);
-    background: transparent;
-    color: hsl(0 0% 95%);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    transition: border-color 0.2s;
-  }
-
-  .lobobot-drawer-item__qty button:hover { border-color: hsl(0 0% 40%); }
-
-  .lobobot-drawer-item__qty span {
-    width: 28px;
-    text-align: center;
-    font-size: 0.8125rem;
-  }
-
-  .lobobot-drawer__footer {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid hsl(0 0% 15%);
-  }
-
-  .lobobot-drawer__total {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-
-  .lobobot-drawer__total-label {
-    font-size: 1rem;
-    font-weight: 600;
-  }
-
-  .lobobot-drawer__total-price {
-    font-size: 1.125rem;
-    font-weight: 700;
-  }
-
-  .lobobot-drawer__checkout {
-    width: 100%;
-    padding: 14px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    background: hsl(25 95% 53%);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-
-  .lobobot-drawer__checkout:hover { opacity: 0.9; }
-  .lobobot-drawer__checkout:disabled { opacity: 0.5; cursor: not-allowed; }
-
   @keyframes lobobot-float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-12px); }
   }
 
-  @keyframes lobobot-spin {
-    to { transform: rotate(360deg); }
-  }
   @keyframes lobobot-spin {
     to { transform: rotate(360deg); }
   }
@@ -473,36 +225,6 @@
     </div>
   </div>
 </section>
-
-<!-- Cart floating button -->
-<button class="lobobot-cart-btn" id="lobobot-cart-btn" onclick="window.__lobobotToggleDrawer()" style="display:none;">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-  <span class="lobobot-cart-badge" id="lobobot-cart-badge" style="display:none;">0</span>
-</button>
-
-<!-- Cart drawer -->
-<div class="lobobot-drawer-overlay" id="lobobot-drawer-overlay" onclick="window.__lobobotToggleDrawer()"></div>
-<div class="lobobot-drawer" id="lobobot-drawer">
-  <div class="lobobot-drawer__header">
-    <span class="lobobot-drawer__title">Carrito</span>
-    <button class="lobobot-drawer__close" onclick="window.__lobobotToggleDrawer()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="lobobot-drawer__body" id="lobobot-drawer-body">
-    <div class="lobobot-drawer__empty">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-      <p>Tu carrito está vacío</p>
-    </div>
-  </div>
-  <div class="lobobot-drawer__footer" id="lobobot-drawer-footer" style="display:none;">
-    <div class="lobobot-drawer__total">
-      <span class="lobobot-drawer__total-label">Total</span>
-      <span class="lobobot-drawer__total-price" id="lobobot-drawer-total">$0</span>
-    </div>
-    <button class="lobobot-drawer__checkout" id="lobobot-drawer-checkout" onclick="window.__lobobotCheckout()">Checkout con Shopify</button>
-  </div>
-</div>
 
 <div id="lobobot-toast" class="lobobot-toast"></div>
 
@@ -559,36 +281,6 @@
     }
   `;
 
-
-  const CART_CREATE = `
-    mutation cartCreate($input: CartInput!) {
-      cartCreate(input: $input) {
-        cart {
-          id
-          checkoutUrl
-          lines(first: 100) { edges { node { id merchandise { ... on ProductVariant { id } } } } }
-        }
-        userErrors { field message }
-      }
-    }
-  `;
-
-  const CART_LINES_ADD = `
-    mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
-      cartLinesAdd(cartId: $cartId, lines: $lines) {
-        cart {
-          id
-          lines(first: 100) { edges { node { id merchandise { ... on ProductVariant { id } } } } }
-        }
-        userErrors { field message }
-      }
-    }
-  `;
-
-  let cartId = null;
-  let checkoutUrl = null;
-  let cartItems = []; // { variantId, lineId, title, price, currencyCode, quantity, imageUrl }
-
   async function storefrontRequest(query, variables) {
     const res = await fetch(STOREFRONT_URL, {
       method: 'POST',
@@ -611,132 +303,46 @@
     setTimeout(() => toast.classList.remove('show'), 2500);
   }
 
-  function updateCartUI() {
-    const totalItems = cartItems.reduce((s, i) => s + i.quantity, 0);
-    const btn = document.getElementById('lobobot-cart-btn');
-    const badge = document.getElementById('lobobot-cart-badge');
-    const body = document.getElementById('lobobot-drawer-body');
-    const footer = document.getElementById('lobobot-drawer-footer');
-    const totalEl = document.getElementById('lobobot-drawer-total');
-
-    btn.style.display = 'flex';
-    if (totalItems > 0) {
-      badge.style.display = 'flex';
-      badge.textContent = totalItems;
-    } else {
-      badge.style.display = 'none';
-    }
-
-    if (cartItems.length === 0) {
-      body.innerHTML = '<div class="lobobot-drawer__empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><p>Tu carrito está vacío</p></div>';
-      footer.style.display = 'none';
-      return;
-    }
-
-    footer.style.display = 'block';
-    const total = cartItems.reduce((s, i) => s + (parseFloat(i.price) * i.quantity), 0);
-    totalEl.textContent = '$' + total.toLocaleString('es-CO', {minimumFractionDigits:0, maximumFractionDigits:0}) + ' ' + (cartItems[0]?.currencyCode || '');
-
-    body.innerHTML = cartItems.map((item, idx) => `
-      <div class="lobobot-drawer-item">
-        <div class="lobobot-drawer-item__img">
-          ${item.imageUrl ? '<img src="' + item.imageUrl + '" alt="' + item.title + '">' : ''}
-        </div>
-        <div class="lobobot-drawer-item__info">
-          <div class="lobobot-drawer-item__title">${item.title}</div>
-          <div class="lobobot-drawer-item__variant">${item.variantTitle || ''}</div>
-          <div class="lobobot-drawer-item__price">$${parseFloat(item.price).toLocaleString('es-CO', {minimumFractionDigits:0, maximumFractionDigits:0})} ${item.currencyCode}</div>
-        </div>
-        <div class="lobobot-drawer-item__actions">
-          <button class="lobobot-drawer-item__remove" onclick="window.__lobobotRemoveItem(${idx})">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </button>
-          <div class="lobobot-drawer-item__qty">
-            <button onclick="window.__lobobotUpdateQty(${idx}, ${item.quantity - 1})">−</button>
-            <span>${item.quantity}</span>
-            <button onclick="window.__lobobotUpdateQty(${idx}, ${item.quantity + 1})">+</button>
-          </div>
-        </div>
-      </div>
-    `).join('');
+  /* Extract numeric variant ID from GID */
+  function getNumericId(gid) {
+    const match = gid.match(/(\d+)$/);
+    return match ? match[1] : gid;
   }
 
-  function openDrawer() {
-    document.getElementById('lobobot-drawer').classList.add('open');
-    document.getElementById('lobobot-drawer-overlay').classList.add('open');
-  }
-
-  function closeDrawer() {
-    document.getElementById('lobobot-drawer').classList.remove('open');
-    document.getElementById('lobobot-drawer-overlay').classList.remove('open');
-  }
-
-  window.__lobobotToggleDrawer = function() {
-    const drawer = document.getElementById('lobobot-drawer');
-    drawer.classList.contains('open') ? closeDrawer() : openDrawer();
-  };
-
-  window.__lobobotRemoveItem = function(idx) {
-    cartItems.splice(idx, 1);
-    if (cartItems.length === 0) { cartId = null; checkoutUrl = null; }
-    updateCartUI();
-  };
-
-  window.__lobobotUpdateQty = function(idx, qty) {
-    if (qty <= 0) { window.__lobobotRemoveItem(idx); return; }
-    cartItems[idx].quantity = qty;
-    updateCartUI();
-  };
-
-  window.__lobobotCheckout = function() {
-    if (checkoutUrl) window.open(checkoutUrl, '_blank');
-  };
-
-  async function addToCart(variantId, title, imageUrl, price, currencyCode, variantTitle) {
+  /* Add to cart using Shopify native Cart API */
+  async function addToCart(variantGid, title) {
+    const numericId = getNumericId(variantGid);
     try {
-      const existing = cartItems.find(i => i.variantId === variantId);
-      if (!cartId) {
-        const data = await storefrontRequest(CART_CREATE, {
-          input: { lines: [{ quantity: 1, merchandiseId: variantId }] }
-        });
-        const cart = data?.data?.cartCreate?.cart;
-        if (cart) {
-          cartId = cart.id;
-          const url = new URL(cart.checkoutUrl);
-          url.searchParams.set('channel', 'online_store');
-          checkoutUrl = url.toString();
-          const lineId = cart.lines.edges[0]?.node?.id || null;
-          cartItems.push({ variantId, lineId, title, price, currencyCode, quantity: 1, imageUrl, variantTitle });
-        }
-      } else if (existing) {
-        existing.quantity += 1;
-        await storefrontRequest(CART_LINES_ADD, {
-          cartId: cartId,
-          lines: [{ quantity: 1, merchandiseId: variantId }]
-        });
-      } else {
-        const data = await storefrontRequest(CART_LINES_ADD, {
-          cartId: cartId,
-          lines: [{ quantity: 1, merchandiseId: variantId }]
-        });
-        const lines = data?.data?.cartLinesAdd?.cart?.lines?.edges || [];
-        const newLine = lines.find(l => l.node.merchandise.id === variantId);
-        cartItems.push({ variantId, lineId: newLine?.node?.id || null, title, price, currencyCode, quantity: 1, imageUrl, variantTitle });
-      }
-      updateCartUI();
-      openDrawer();
+      const res = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: [{ id: parseInt(numericId), quantity: 1 }] })
+      });
+      if (!res.ok) throw new Error('Error ' + res.status);
+
       showToast(title + ' agregado al carrito');
+
+      /* Update the theme's cart count badge if available */
+      try {
+        const cartRes = await fetch('/cart.js');
+        const cart = await cartRes.json();
+        /* Try common theme selectors for cart count */
+        document.querySelectorAll('[data-cart-count], .cart-count, .cart-count-bubble, .js-cart-count').forEach(function(el) {
+          el.textContent = cart.item_count;
+          el.style.display = cart.item_count > 0 ? '' : 'none';
+        });
+        /* Trigger theme cart drawer open if available */
+        document.dispatchEvent(new CustomEvent('cart:refresh'));
+        document.dispatchEvent(new CustomEvent('cart:added'));
+      } catch(e) { /* ignore badge update errors */ }
+
     } catch (err) {
       console.error('Add to cart failed:', err);
       showToast('Error al agregar al carrito');
     }
   }
 
-  // Store all products for reference when adding to cart
-  let allProducts = [];
-
   function renderProducts(products) {
-    allProducts = products;
     const container = document.getElementById('lobobot-products');
 
     if (products.length === 0) {
@@ -745,7 +351,7 @@
     }
 
     container.className = 'lobobot-grid';
-    container.innerHTML = products.map(function(edge, idx) {
+    container.innerHTML = products.map(function(edge) {
       const p = edge.node;
       const img = p.images.edges[0]?.node;
       const price = p.priceRange.minVariantPrice;
@@ -766,7 +372,7 @@
             <p class="lobobot-card__price">${price.currencyCode} ${parseFloat(price.amount).toFixed(2)}</p>
           </a>
           ${available
-            ? `<button class="lobobot-card__btn" onclick="event.preventDefault(); window.__lobobotAddToCart('${variant.id}', '${p.title.replace(/'/g, "\\'")}', '${img ? img.url : ''}', '${variant.price.amount}', '${variant.price.currencyCode}', '${variant.title.replace(/'/g, "\\'")}')">
+            ? `<button class="lobobot-card__btn" onclick="event.preventDefault(); window.__lobobotAddToCart('${variant.id}', '${p.title.replace(/'/g, "\\'")}')">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                 Agregar al carrito
               </button>`
@@ -775,13 +381,10 @@
         </article>
       `;
     }).join('');
-
-    // Show cart button
-    document.getElementById('lobobot-cart-btn').style.display = 'flex';
   }
 
-  window.__lobobotAddToCart = function(variantId, title, imageUrl, price, currencyCode, variantTitle) {
-    addToCart(variantId, title, imageUrl, price, currencyCode, variantTitle);
+  window.__lobobotAddToCart = function(variantId, title) {
+    addToCart(variantId, title);
   };
 
   var collectionHandle = '{{ section.settings.collection.handle | default: "" }}'.trim();
