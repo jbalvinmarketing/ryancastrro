@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -6,23 +6,22 @@ import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide
 import { useCartStore } from "@/stores/cartStore";
 
 export const CartDrawer = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { items, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
+  const { items, isLoading, isSyncing, isDrawerOpen, setDrawerOpen, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + (parseFloat(item.price.amount) * item.quantity), 0);
 
-  useEffect(() => { if (isOpen) syncCart(); }, [isOpen, syncCart]);
+  useEffect(() => { if (isDrawerOpen) syncCart(); }, [isDrawerOpen, syncCart]);
 
   const handleCheckout = () => {
     const checkoutUrl = getCheckoutUrl();
     if (checkoutUrl) {
       window.open(checkoutUrl, '_blank');
-      setIsOpen(false);
+      setDrawerOpen(false);
     }
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isDrawerOpen} onOpenChange={setDrawerOpen}>
       <SheetTrigger asChild>
         <button className="relative text-muted-foreground hover:text-foreground transition-colors">
           <ShoppingCart className="w-5 h-5" />
