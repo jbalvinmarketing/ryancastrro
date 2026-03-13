@@ -253,6 +253,28 @@
   const STOREFRONT_URL = 'https://{{ shop.permanent_domain }}/api/2025-07/graphql.json';
   const STOREFRONT_TOKEN = '{{ section.settings.storefront_token }}';
 
+  function forceTransparentThemeShell() {
+    var mainContent = document.getElementById('MainContent');
+    if (mainContent) {
+      mainContent.style.background = 'transparent';
+      mainContent.style.backgroundColor = 'transparent';
+    }
+
+    var contentForLayout = document.querySelector('.content-for-layout');
+    if (contentForLayout) {
+      contentForLayout.style.background = 'transparent';
+      contentForLayout.style.backgroundColor = 'transparent';
+    }
+
+    var sectionRoot = document.getElementById('shopify-section-{{ section.id }}');
+    if (sectionRoot) {
+      sectionRoot.style.background = 'transparent';
+      sectionRoot.style.backgroundColor = 'transparent';
+    }
+  }
+
+  forceTransparentThemeShell();
+
   const COLLECTION_QUERY = `
     query GetCollection($handle: String!, $first: Int!) {
       collection(handle: $handle) {
