@@ -85,7 +85,7 @@ const Index = () => {
           </div>
 
           {/* Footer - dentro del scroll container */}
-          <footer className="mt-8 pb-4">
+          <footer className="mt-8 pb-4 px-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               {/* Copyright */}
               <p className="text-xs text-white/50">
